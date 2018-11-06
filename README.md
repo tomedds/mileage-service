@@ -28,7 +28,9 @@ TBD
 
 ## Execution
 
-When you start the application, it resets the collection, loads the car data, and waits for requests to the REST service.
+You may need to run LoadCarData to reset the collection and loads the car data into the database.
+
+Running the main application using the JAR built by Spring Boot.
 
 Currently there is one query supported:
 

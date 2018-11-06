@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 
 import static com.xlson.groovycsv.CsvParser.parseCsv
 
-@SpringBootApplication
 class LoadCarData implements CommandLineRunner {
 
     @Value('${mileage.mongo.db_name}')
