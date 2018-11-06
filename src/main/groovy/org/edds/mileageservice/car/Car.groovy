@@ -1,9 +1,10 @@
 package org.edds.mileageservice.car
 
+import org.edds.mileageservice.car_model.CarModel
+
 class Car {
 
-    String make
-    String model
-    String year
+    CarModel model
+    int mileage
 
 }

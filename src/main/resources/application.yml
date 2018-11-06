@@ -6,8 +6,13 @@ logging:
 
 mileage:
   name: Mileage app
+  car_model_data_path : /Users/tom/dev/mileage/mileage-service/data/vehicles-simpler.csv
+  user_data_path: /Users/tom/dev/mileage/mileage-service/data/users.json
+
+
   mongo:
     db_name: mileage-service
-    car_collection_name: cars
+    car_model_collection_name: car_models
+    user_collection_name: users
 
 ---

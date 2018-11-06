@@ -12,6 +12,10 @@ NOTE: this application is in the very early stages of development.
 MongoDB server
 
 
+### Building
+
+ `./gradlew build`
+
 ### Installing
 
 TBD 
@@ -19,8 +23,7 @@ TBD
 
 ## Running the tests
 
-TBD
-
+Tests are run as part of the standard build.
 
 ## Deployment
 
@@ -28,15 +31,19 @@ TBD
 
 ## Execution
 
-You may need to run LoadCarData to reset the collection and loads the car data into the database.
+You may need to run LoadData to reset the collection and loads the car data into the database.
 
-Running the main application using the JAR built by Spring Boot.
+Run the main application using the JAR built by Spring Boot.
 
-Currently there is one query supported:
+### REST API
 
- `GET http://localhost:8080/api/cars`
+ `GET http://localhost:8080/api/car_models` - fetch the list of car models 
 
-will fetch a list of car with make, model, and year.
+
+ `GET http://localhost:8080/api/users` - fetch the list of users
+
+ `POST http://localhost:8080/api/users` - create a user
+
 
 ## Built With
 
@@ -62,7 +69,7 @@ TBD
 
 ## Acknowledgements
 
-TBD
+Car model data somes from https://www.fueleconomy.gov/feg/ws/index.shtml
 
 
 [//]: # (This file based on a temlpate from https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
