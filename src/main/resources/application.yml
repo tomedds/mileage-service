@@ -1,0 +1,13 @@
+
+logging:
+  level:
+    org.springframework.web: ERROR
+    org.edds: DEBUG
+
+mileage:
+  name: Mileage app
+  mongo:
+    db_name: mileage-service
+    car_collection_name: cars
+
+---

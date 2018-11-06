@@ -1,4 +1,4 @@
-package org.edds.tools
+package org.edds.mileageservice
 
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
@@ -6,19 +6,36 @@ import org.bson.Document
 
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoClient
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.CommandLineRunner
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
 
 import static com.xlson.groovycsv.CsvParser.parseCsv
 
-class LoadCarData {
+@SpringBootApplication
+class LoadCarData implements CommandLineRunner {
 
-    public static String MILEAGE_DB = "mileage-service"
-    public static String CARS_COLLECTION = "cars"
+    @Value('${mileage.mongo.db_name}')
+    String dbName;
+
+    @Value('${mileage.mongo.car_collection_name}')
+    String carCollectionName
 
     static void main(String[] args) {
+        SpringApplication app = new SpringApplication(LoadCarData.class);
+        app.run()
+    }
+
+    void run(String... args) throws Exception {
+
+
+        println "Loading collection in DB=${dbName}"
 
         MongoClient mongoClient = MongoClients.create();
-        MongoDatabase mileageDb = mongoClient.getDatabase(MILEAGE_DB)
-        MongoCollection<Document> carCollection = mileageDb.getCollection(CARS_COLLECTION)
+        MongoDatabase mileageDb = mongoClient.getDatabase(dbName)
+        MongoCollection<Document> carCollection = mileageDb.getCollection(carCollectionName)
 
         // drop any existing collection
         carCollection.drop()
@@ -44,6 +61,5 @@ class LoadCarData {
         }
 
         println "loaded data for ${carData.size()} cars."
-
     }
 }

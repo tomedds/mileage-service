@@ -26,6 +26,16 @@ TBD
 
 TBD
 
+## Execution
+
+When you start the application, it resets the collection, loads the car data, and waits for requests to the REST service.
+
+Currently there is one query supported:
+
+ `GET http://localhost:8080/api/cars`
+
+will fetch a list of car with make, model, and year.
+
 ## Built With
 
 * [Spring Initializr](https://start.spring.io/) - Good way to start Spring projects
