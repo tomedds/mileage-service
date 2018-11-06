@@ -42,7 +42,7 @@ TBD
 
 ## Authors
 
-* **Tom Edds ** - *Initial work* 
+* **Tom Edds** - *Initial work* 
 
 ## License
 
