@@ -69,7 +69,7 @@ TBD
 
 ## Acknowledgements
 
-Car model data somes from https://www.fueleconomy.gov/feg/ws/index.shtml
+Car model data comes from https://www.fueleconomy.gov/feg/ws/index.shtml
 
 
 [//]: # (This file based on a temlpate from https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
