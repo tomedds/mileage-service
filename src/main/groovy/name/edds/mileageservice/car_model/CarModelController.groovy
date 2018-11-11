@@ -1,4 +1,4 @@
-package org.edds.mileageservice.car_model
+package name.edds.mileageservice.car_model
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

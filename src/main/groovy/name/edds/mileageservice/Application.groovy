@@ -1,4 +1,4 @@
-package org.edds.mileageservice
+package name.edds.mileageservice
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

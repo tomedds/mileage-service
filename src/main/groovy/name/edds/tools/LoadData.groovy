@@ -1,4 +1,4 @@
-package org.edds.tools
+package name.edds.tools
 
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase

@@ -1,14 +1,16 @@
-package org.edds.mileageservice.car_model
+package name.edds.mileageservice.car_model
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoCursor
 import com.mongodb.client.MongoDatabase
+import groovy.transform.TypeChecked
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
+@TypeChecked
 @Component
 class CarModelService {
 
@@ -29,28 +31,21 @@ class CarModelService {
 
         MongoClient mongoClient = MongoClients.create();
         MongoDatabase mileageDb = mongoClient.getDatabase(dbName)
-        MongoCollection<Document> carCollection = mileageDb.getCollection(carCollectionName)
+        MongoCollection<CarModel> carCollection = mileageDb.getCollection(carCollectionName, CarModel.class)
 
-        MongoCursor<Document> cursor = carCollection.find().iterator()
+        MongoCursor<CarModel> cursor = carCollection.find().iterator()
 
-        List<CarModel> cars = new ArrayList<>()
+        List<CarModel> carModels = new ArrayList<>()
 
         try {
             while (cursor.hasNext()) {
-
-                def carDocument = cursor.next()
-
-                CarModel car = new CarModel(make: carDocument.make,
-                model: carDocument.model,
-                year: carDocument.year)
-
-                cars.add(car)
+                 carModels.add(cursor.next())
             }
         } finally {
             cursor.close();
         }
 
-        return cars
+        return carModels
     }
 
 
