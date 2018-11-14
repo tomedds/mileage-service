@@ -7,11 +7,12 @@ import org.bson.types.ObjectId;
 @TypeChecked
 class User {
 
-    ObjectId id
+    ObjectId _id
     String lastName
     String firstName
     String email
 
+    ObjectId defaultCar
     List<Car> cars
 
     /* TODO: implement equals(), hashCode(), toString() */

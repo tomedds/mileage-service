@@ -5,6 +5,7 @@ import com.mongodb.client.*
 
 import groovy.transform.TypeChecked
 import name.edds.mileageservice.car.Car
+import name.edds.mileageservice.car.CarService
 import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.bson.types.ObjectId
@@ -52,7 +53,7 @@ class UserService {
     }
 
     /**
-     *
+     * Add a new user to the DB
      * @param user
      * @return
      */
@@ -62,7 +63,7 @@ class UserService {
 
         try {
             userCollection.insertOne(user)
-            return user.id
+            return user._id
         } catch (e) {
             // TODO: add logger
             println(e);
@@ -71,9 +72,26 @@ class UserService {
     }
 
     /**
+     * Update a the default car
+     * @param user
+     * @return
+     */
+
+    void updateDefaultCar(User user, Car car) {
+
+        MongoCollection<User> userCollection = setupUserCollection()
+
+        userCollection.updateOne(eq("_id", user._id),
+                combine(set("defaultCar", car._id)))
+
+
+    }
+
+    /**
      * Find the user with the specified ID
      *
-     * @return list of users
+     * @return the User matching the ID if found
+     * if not found, returns ??
      */
     User findUser(ObjectId userObjectId) {
         MongoCollection<User> userCollection = setupUserCollection()
@@ -89,20 +107,32 @@ class UserService {
      */
     String addCarToUser(ObjectId id, Car car) {
 
+        /* Validate parameters */
+
+        CarService carService = new CarService()
+        car._id = new ObjectId()
+        String message = carService.validateNewCar(car)
+
+        if (message) {
+            return message
+        }
+
         User user = findUser(id)
 
         if (null == user) {
             return "user not found"
         }
 
+        /* Procced with adding this car to this user */
         if (null == user.cars) {
             user.cars = new ArrayList<Car>()
         }
 
+        car.dateAdded = new Date()
         user.cars.add(car)
 
         MongoCollection<User> userCollection = setupUserCollection()
-    //  collection.updateOne(eq("name", "Ada Byron"), combine(set("age", 23), set("name", "Ada Lovelace")));
+        //  collection.updateOne(eq("name", "Ada Byron"), combine(set("age", 23), set("name", "Ada Lovelace")));
 
         userCollection.updateOne(eq("_id", id),
                 combine(set("cars", user.cars)))
@@ -134,7 +164,7 @@ class UserService {
             return null
         }
 
-        new User(id: userDocument._id as ObjectId,
+        new User(_id: userDocument._id as ObjectId,
                 lastName: userDocument.lastName as String,
                 firstName: userDocument.firstName as String,
                 email: userDocument.email as String)

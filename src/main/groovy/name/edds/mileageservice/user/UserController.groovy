@@ -1,6 +1,7 @@
 package name.edds.mileageservice.user
 
-
+import groovy.transform.TypeChecked
+import name.edds.mileageservice.car.CarService
 import org.bson.types.ObjectId
 import name.edds.mileageservice.car.Car
 import name.edds.mileageservice.car_model.CarModel
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-// TypeChecked
+@TypeChecked
 @RestController
 @RequestMapping("/api/users")
 class UserController {
@@ -47,7 +49,6 @@ class UserController {
 
             if (null == user) {
                 return new ResponseEntity<User>(
-                        null,
                         HttpStatus.NOT_FOUND)
             } else {
 
@@ -58,9 +59,9 @@ class UserController {
         }
         catch (IllegalArgumentException ex) {
             //  LOGGER.error()
-            System.err.println("id is not a valid ObjectId")
+            System.err.println("_id is not a valid ObjectId")
             new ResponseEntity<User>(
-                    null,
+
                     HttpStatus.BAD_REQUEST)
 
         }
@@ -85,30 +86,44 @@ class UserController {
  * @return
  */
     @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
-    ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody CarModel carModel) {
+    ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody Car newCar,
+                                        @RequestParam(required = false, value = "makeDefault") Boolean makeDefault) {
+
+        ObjectId userId
+        User user
+        String errMsg
 
         try {
-            ObjectId userObjectId = new ObjectId(id)
-
-            Car newCar = new Car(carModel: carModel)
-
-            String msg = userService.addCarToUser(userObjectId, newCar).isEmpty();
-
-            if (msg.isEmpty()) {
-                return new ResponseEntity<String>(
-                        "",
-                        HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<String>(msg, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
+            userId = new ObjectId(id)
         }
         catch (IllegalArgumentException ex) {
-            //  LOGGER.error()
-            System.err.println("id is not a valid ObjectId")
-            return new ResponseEntity<String>("id is not a valid ObjectId", HttpStatus.BAD_REQUEST)
+            errMsg = "_id value is not a valid ObjectId"
         }
 
+        if (!errMsg) {
+            // confirm that user exists
+            user = userService.findUser(userId)
+
+            if (null == user) {
+                return new ResponseEntity<String>("User not found", HttpStatus.NOT_FOUND);
+            }
+        }
+
+        if (!errMsg) {
+            errMsg = userService.addCarToUser(userId, newCar);
+        }
+
+        // make this the default car if requested.
+
+        if (!errMsg && makeDefault) {
+            userService.updateDefaultCar(user, newCar)
+        }
+
+        if (!errMsg) {
+            return new ResponseEntity<String>("", HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
 
     }
 

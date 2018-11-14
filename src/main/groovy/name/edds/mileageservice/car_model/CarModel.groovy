@@ -6,9 +6,10 @@ import org.bson.types.ObjectId
 @TypeChecked
 class CarModel {
 
-    ObjectId id;
+    ObjectId _id
     String make
     String model
+    // use String for year so we match the imported data
     String year
 
 }
