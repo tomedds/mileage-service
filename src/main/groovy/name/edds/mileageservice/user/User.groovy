@@ -11,8 +11,6 @@ class User {
     String lastName
     String firstName
     String email
-
-    ObjectId defaultCar
     List<Car> cars
 
     /* TODO: implement equals(), hashCode(), toString() */

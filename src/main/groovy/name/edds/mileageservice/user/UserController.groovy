@@ -36,16 +36,68 @@ class UserController {
     }
 
     /**
-     * Get a single user
+     * Get the current user
+     * FIXME: this will be different when we use authentication
      * @return
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    ResponseEntity<User> getUser(@PathVariable("id") String id) {
+    @RequestMapping(value = "/currentUser", method = RequestMethod.GET)
+    ResponseEntity<User> getUCurrentUser() {
+
+        User user = userService.getCurrentUser()
+
+        if (null == user) {
+            return new ResponseEntity<User>(
+                    HttpStatus.NOT_FOUND)
+        } else {
+
+            return new ResponseEntity<User>(
+                    user,
+                    HttpStatus.OK)
+        }
+
+    }
+
+    /**
+     * Get a single user using email
+     * @return
+     */
+    @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
+    ResponseEntity<User> getUserById(@PathVariable("id") String id) {
 
         try {
             ObjectId userObjectId = new ObjectId(id)
 
             User user = userService.findUser(userObjectId)
+
+            if (null == user) {
+                return new ResponseEntity<User>(
+                        HttpStatus.NOT_FOUND)
+            } else {
+
+                return new ResponseEntity<User>(
+                        user,
+                        HttpStatus.OK)
+            }
+        }
+        catch (IllegalArgumentException ex) {
+            //  LOGGER.error()
+            System.err.println("_id is not a valid ObjectId")
+            new ResponseEntity<User>(
+
+                    HttpStatus.BAD_REQUEST)
+
+        }
+    }
+
+    /**
+     * Get a single user using id
+     * @return
+     */
+    @RequestMapping(value = "/email/{email}", method = RequestMethod.GET)
+    ResponseEntity<User> getUserByEmail(@PathVariable("email") String email) {
+
+        try {
+            User user = userService.findUser(email)
 
             if (null == user) {
                 return new ResponseEntity<User>(

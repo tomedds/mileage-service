@@ -5,14 +5,17 @@ logging:
     org.edds: DEBUG
 
 mileage:
-  name: Mileage app
+  name: Mileage service
   car_model_data_path : /Users/tom/dev/mileage/mileage-service/data/vehicles-simpler.csv
   user_data_path: /Users/tom/dev/mileage/mileage-service/data/users.json
+  current_user_email: s_schneider1234@example.com
 
 
   mongo:
     db_name: mileage-service
     car_model_collection_name: car_models
     user_collection_name: users
+
+server.port: 8081
 
 ---

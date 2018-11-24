@@ -9,7 +9,7 @@ NOTE: this application is in the very early stages of development.
 
 ### Prerequisites
 
-MongoDB server
+Accesses a MongoDB server.
 
 
 ### Building

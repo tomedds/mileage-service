@@ -1,14 +1,21 @@
 package name.edds.mileageservice.car_model
 
+import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoCursor
 import com.mongodb.client.MongoDatabase
 import groovy.transform.TypeChecked
+import name.edds.mileageservice.user.User
 import org.bson.Document
+import org.bson.codecs.configuration.CodecRegistry
+import org.bson.codecs.pojo.PojoCodecProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries
 
 @TypeChecked
 @Component
@@ -30,7 +37,12 @@ class CarModelService {
     List<CarModel> listCars() {
 
         MongoClient mongoClient = MongoClients.create();
-        MongoDatabase mileageDb = mongoClient.getDatabase(dbName)
+
+        // create codec registry for POJOs
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        MongoDatabase mileageDb = mongoClient.getDatabase(dbName).withCodecRegistry(pojoCodecRegistry)
+
         MongoCollection<CarModel> carCollection = mileageDb.getCollection(carCollectionName, CarModel.class)
 
         MongoCursor<CarModel> cursor = carCollection.find().iterator()

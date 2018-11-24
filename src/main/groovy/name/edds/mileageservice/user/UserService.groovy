@@ -4,6 +4,7 @@ import com.mongodb.MongoClientSettings
 import com.mongodb.client.*
 
 import groovy.transform.TypeChecked
+import name.edds.mileageservice.Properties
 import name.edds.mileageservice.car.Car
 import name.edds.mileageservice.car.CarService
 import org.bson.codecs.configuration.CodecRegistry
@@ -96,6 +97,28 @@ class UserService {
     User findUser(ObjectId userObjectId) {
         MongoCollection<User> userCollection = setupUserCollection()
         userCollection.find(eq("_id", userObjectId)).first();
+    }
+
+    /**
+     * Find the user with the specified ID
+     *
+     * @return the User matching the ID if found
+     * if not found, returns ??
+     */
+    User getCurrentUser() {
+        MongoCollection<User> userCollection = setupUserCollection()
+        userCollection.find(eq("email", Properties.CURRENT_USER_EMAIL)).first();
+    }
+
+    /**
+     * Find the user with the specified mail
+     *
+     * @return the User matching the email if found
+     * if not found, returns ??
+     */
+    User findUser(String email) {
+        MongoCollection<User> userCollection = setupUserCollection()
+        userCollection.find(eq("email", email)).first()
     }
 
     /**

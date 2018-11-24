@@ -44,14 +44,11 @@ class LoadData implements CommandLineRunner {
     }
 
     void run(String... args) throws Exception {
-
         MongoClient mongoClient = MongoClients.create();
         mileageDb = mongoClient.getDatabase(dbName)
-
         loadUsers()
         loadCarModels()
         assignCars()
-
     }
 
     /**

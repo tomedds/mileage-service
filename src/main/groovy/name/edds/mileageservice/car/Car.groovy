@@ -13,6 +13,7 @@ class Car {
     int mileage
     Date dateAdded
     List <Event> events
+    boolean isDefault
 
     void addEvent(Event event) {
         // TODO: validate event first
@@ -22,7 +23,7 @@ class Car {
     /*
       after there are documents for fill ups, consider adding other fields that contain the cumulative values for those fields
       (mileage tracked, money spent on gas, number of gallson) so they don't have to be computred each time.
-      Or does the overhead of keeping this accurage outwight the khanving mongo do the math when there is a query.
+      Or does the overhead of keeping this accurate without having to using mongo do the math when there is a query.
       
      */
 
