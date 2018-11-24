@@ -73,22 +73,6 @@ class UserService {
     }
 
     /**
-     * Update a the default car
-     * @param user
-     * @return
-     */
-
-    void updateDefaultCar(User user, Car car) {
-
-        MongoCollection<User> userCollection = setupUserCollection()
-
-        userCollection.updateOne(eq("_id", user._id),
-                combine(set("defaultCar", car._id)))
-
-
-    }
-
-    /**
      * Find the user with the specified ID
      *
      * @return the User matching the ID if found
@@ -123,6 +107,7 @@ class UserService {
 
     /**
      * Add a car for this user. These are stored as embedded records within the User record.
+     * If this car is going to be the default, we need to reset the flag for any current default car
      *
      * @param id
      * @param car
@@ -146,16 +131,23 @@ class UserService {
             return "user not found"
         }
 
-        /* Procced with adding this car to this user */
+        /* Proceed with adding this car to this user */
         if (null == user.cars) {
             user.cars = new ArrayList<Car>()
         }
 
+        /* reset the default flag if needed */
+
+        user.cars.each {
+            thisCar ->
+                if (thisCar.isDefault) {
+                    thisCar.isDefault = false
+                }
+        }
         car.dateAdded = new Date()
         user.cars.add(car)
 
         MongoCollection<User> userCollection = setupUserCollection()
-        //  collection.updateOne(eq("name", "Ada Byron"), combine(set("age", 23), set("name", "Ada Lovelace")));
 
         userCollection.updateOne(eq("_id", id),
                 combine(set("cars", user.cars)))

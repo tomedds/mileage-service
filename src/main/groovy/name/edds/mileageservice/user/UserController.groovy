@@ -135,11 +135,11 @@ class UserController {
 
 /**
  * Add a car to the user.
+ * FIXME: make sure the make/model/year combination is valid
  * @return
  */
     @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
-    ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody Car newCar,
-                                        @RequestParam(required = false, value = "makeDefault") Boolean makeDefault) {
+    ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody Car newCar) {
 
         ObjectId userId
         User user
@@ -161,14 +161,9 @@ class UserController {
             }
         }
 
+        /* add car and make it the default if needed */
         if (!errMsg) {
             errMsg = userService.addCarToUser(userId, newCar);
-        }
-
-        // make this the default car if requested.
-
-        if (!errMsg && makeDefault) {
-            userService.updateDefaultCar(user, newCar)
         }
 
         if (!errMsg) {
@@ -178,5 +173,6 @@ class UserController {
         return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
 
     }
+
 
 }
