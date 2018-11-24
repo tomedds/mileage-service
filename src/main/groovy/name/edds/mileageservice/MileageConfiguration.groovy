@@ -11,7 +11,7 @@ class MileageConfiguration implements WebMvcConfigurer{
 
     @Override
     void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/*").allowedOrigins("http://localhost:8080");
+        registry.addMapping("/api/**").allowedOrigins("http://localhost:8080");
     }
 
 }
