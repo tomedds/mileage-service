@@ -8,16 +8,17 @@ import org.bson.types.ObjectId
 @TypeChecked
 class Car {
 
-    ObjectId _id;
+    ObjectId id
     CarModel carModel
     int mileage
     Date dateAdded
-    List <Event> events
+    List<Event> events = []
     boolean isDefault
 
-    void addEvent(Event event) {
+    void addEvent(def event) {
         // TODO: validate event first
-        events.add(event)
+       // events << event
+        throw new IllegalStateException("method not implemented")
     }
 
     /*

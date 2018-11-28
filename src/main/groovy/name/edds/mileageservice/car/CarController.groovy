@@ -36,8 +36,7 @@ class CarController {
 
         int debug = 0;
         return new ResponseEntity<>(
-                carService.listCars(new ObjectId(id), userService),
-                HttpStatus.OK)
+                carService.listCars(new ObjectId(id)), HttpStatus.OK)
 
 
     }
@@ -51,16 +50,16 @@ class CarController {
 
         ObjectId userId
         User user
-        String errMsg
+        String resultStr
 
         try {
             userId = new ObjectId(id)
         }
         catch (IllegalArgumentException ex) {
-            errMsg = "_id value is not a valid ObjectId"
+            resultStr = "id value is not a valid ObjectId"
         }
 
-        if (!errMsg) {
+        if (!resultStr) {
             // confirm that user exists
             user = userService.findUser(userId)
 
@@ -70,8 +69,57 @@ class CarController {
         }
 
         /* add car and make it the default if needed */
+        // FIXME: currently the most recently added car is the default
+
+        if (!resultStr) {
+            resultStr = carService.addCarToUser(userId, newCar);
+        }
+
+        // at this point resultStr is either the id for the new car or an error message
+
+        if (ObjectId.isValid(resultStr)) {
+            return new ResponseEntity<String>("{\"id\": \"$resultStr\"}".toString(), HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<String>(resultStr, HttpStatus.BAD_REQUEST);
+
+    }
+
+    /**
+     * Add a fueling event to a car
+     *
+     * @return
+     */
+    @RequestMapping(value = "/{userId}/cars/fueling}", method = RequestMethod.POST)
+    ResponseEntity<String> addFueling(@PathVariable("userId") String userId, @RequestBody Fueling fueling) {
+
+        ObjectId userObjectId
+        String errMsg
+
+        try {
+            userObjectId = new ObjectId(userId)
+        }
+        catch (IllegalArgumentException ex) {
+            errMsg = "id value is not a valid ObjectId"
+        }
+
+
         if (!errMsg) {
-            errMsg = userService.addCarToUser(userId, newCar);
+
+            // get the user document
+            User user = userService.findUser(userObjectId)
+
+            Car defaultCar = carService.findDefaultCar(user)
+
+            // what is the Mongo way to add an item to a list which is a nested document?
+            // with the codec, do we add it to the USer and then save it?
+            if (null == defaultCar) {
+                return new ResponseEntity<String>("Default car not found", HttpStatus.NOT_FOUND);
+            }
+
+            // FIXME: for now, always add fueling to default car. This needs to be the currently selected car
+            errMsg = carService.addFueling(user, defaultCar, fueling)
+
         }
 
         if (!errMsg) {

@@ -76,7 +76,7 @@ class UserController {
                 user = userService.findUser(objectId)
             }
             catch (IllegalArgumentException ex) {
-                System.err.println("_id is not a valid ObjectId")
+                System.err.println("id is not a valid ObjectId")
                 new ResponseEntity<User>(
                         user,
                         HttpStatus.BAD_REQUEST)
@@ -125,7 +125,7 @@ class UserController {
             userId = new ObjectId(id)
         }
         catch (IllegalArgumentException ex) {
-            errMsg = "_id value is not a valid ObjectId"
+            errMsg = "id value is not a valid ObjectId"
         }
 
         if (!errMsg) {

@@ -2,6 +2,7 @@ package name.edds.mileageservice.car
 
 import groovy.transform.TypeChecked
 import name.edds.mileageservice.car_model.CarModel
+import name.edds.mileageservice.user.UserService
 import org.bson.types.ObjectId
 
 /**
@@ -15,13 +16,15 @@ class CarServiceTest extends GroovyTestCase {
      */
     void testNewCarValidation() {
 
-        CarService carService = new CarService()
+        UserService userService = new UserService()
+
+        CarService carService = new CarService(userService)
         Car newCar = new Car()
 
         String errMsg = carService.validateNewCar(newCar)
         assert errMsg == "Car is missing an ID"
 
-        newCar._id = new ObjectId()
+        newCar.id = new ObjectId()
 
         errMsg = carService.validateNewCar(newCar)
         assert errMsg == "Car is missing model information"

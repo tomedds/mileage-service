@@ -73,7 +73,7 @@ class UserService {
 
         try {
             userCollection.insertOne(user)
-            return user._id
+            return user.id
         } catch (e) {
             // TODO: add logger
             println(e);
@@ -89,7 +89,7 @@ class UserService {
      */
     User findUser(ObjectId userObjectId) {
         MongoCollection<User> userCollection = setupUserCollection()
-        userCollection.find(eq("_id", userObjectId)).first();
+        userCollection.find(eq("_id", userObjectId)).first()
     }
 
     /**
@@ -115,59 +115,9 @@ class UserService {
         userCollection.find(eq("email", email)).first()
     }
 
-    /**
-     * Add a car for this user. These are stored as embedded records within the User record.
-     * If this car is going to be the default, we need to reset the flag for any current default car
-     *
-     * @param id
-     * @param car
-     * @return
-     */
-    String addCarToUser(ObjectId id, Car car) {
-
-        /* Validate parameters */
-
-        CarService carService = new CarService()
-        car._id = new ObjectId()
-        String message = carService.validateNewCar(car)
-
-        if (message) {
-            return message
-        }
-
-        User user = findUser(id)
-
-        if (null == user) {
-            return "user not found"
-        }
-
-        /* Proceed with adding this car to this user */
-        if (null == user.cars) {
-            user.cars = new ArrayList<Car>()
-        }
-
-        /* reset the default flag if needed */
-
-        user.cars.each {
-            thisCar ->
-                if (thisCar.isDefault) {
-                    thisCar.isDefault = false
-                }
-        }
-        car.dateAdded = new Date()
-        user.cars.add(car)
-
-        MongoCollection<User> userCollection = setupUserCollection()
-
-        userCollection.updateOne(eq("_id", id),
-                combine(set("cars", user.cars)))
-
-        return ""
-    }
-
     MongoCollection<User> setupUserCollection() {
 
-        MongoClient mongoClient = MongoClients.create();
+        MongoClient mongoClient = MongoClients.create()
 
         // create codec registry for POJOs
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
