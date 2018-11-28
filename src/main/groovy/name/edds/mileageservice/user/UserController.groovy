@@ -1,10 +1,7 @@
 package name.edds.mileageservice.user
 
 import groovy.transform.TypeChecked
-import name.edds.mileageservice.car.CarService
 import org.bson.types.ObjectId
-import name.edds.mileageservice.car.Car
-import name.edds.mileageservice.car_model.CarModel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,8 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+
+import static com.mongodb.client.model.Filters.eq
+
+// FIXME: allow lookup for user by either ID or email without specifying type.
+// If it is a value email, use it that way.
+// Otherwise, assume it's an ID
 
 @TypeChecked
 @RestController
@@ -58,66 +60,40 @@ class UserController {
     }
 
     /**
-     * Get a single user using email
+     * Get a single user using either the ID or email
      * @return
      */
-    @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
-    ResponseEntity<User> getUserById(@PathVariable("id") String id) {
+    @RequestMapping(value = "/{identifier}", method = RequestMethod.GET)
+    ResponseEntity<User> getUserById(@PathVariable("identifier") String identifier) {
 
-        try {
-            ObjectId userObjectId = new ObjectId(id)
+        User user = null
 
-            User user = userService.findUser(userObjectId)
-
-            if (null == user) {
-                return new ResponseEntity<User>(
-                        HttpStatus.NOT_FOUND)
-            } else {
-
-                return new ResponseEntity<User>(
+        if (userService.isValidEmailAddress(identifier)) {
+            user = userService.findUser(identifier)
+        } else {
+            try {
+                ObjectId objectId = new ObjectId(identifier)
+                user = userService.findUser(objectId)
+            }
+            catch (IllegalArgumentException ex) {
+                System.err.println("_id is not a valid ObjectId")
+                new ResponseEntity<User>(
                         user,
-                        HttpStatus.OK)
+                        HttpStatus.BAD_REQUEST)
             }
         }
-        catch (IllegalArgumentException ex) {
-            //  LOGGER.error()
-            System.err.println("_id is not a valid ObjectId")
-            new ResponseEntity<User>(
 
-                    HttpStatus.BAD_REQUEST)
-
+        if (null == user) {
+            return new ResponseEntity<User>(
+                    HttpStatus.NOT_FOUND)
+        } else {
+            return new ResponseEntity<User>(
+                    user,
+                    HttpStatus.OK)
         }
+
     }
 
-    /**
-     * Get a single user using id
-     * @return
-     */
-    @RequestMapping(value = "/email/{email}", method = RequestMethod.GET)
-    ResponseEntity<User> getUserByEmail(@PathVariable("email") String email) {
-
-        try {
-            User user = userService.findUser(email)
-
-            if (null == user) {
-                return new ResponseEntity<User>(
-                        HttpStatus.NOT_FOUND)
-            } else {
-
-                return new ResponseEntity<User>(
-                        user,
-                        HttpStatus.OK)
-            }
-        }
-        catch (IllegalArgumentException ex) {
-            //  LOGGER.error()
-            System.err.println("_id is not a valid ObjectId")
-            new ResponseEntity<User>(
-
-                    HttpStatus.BAD_REQUEST)
-
-        }
-    }
 
 /**
  * Create a new user
@@ -138,7 +114,7 @@ class UserController {
  * FIXME: make sure the make/model/year combination is valid
  * @return
  */
-    @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
+/*    @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
     ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody Car newCar) {
 
         ObjectId userId
@@ -161,7 +137,7 @@ class UserController {
             }
         }
 
-        /* add car and make it the default if needed */
+        *//* add car and make it the default if needed *//*
         if (!errMsg) {
             errMsg = userService.addCarToUser(userId, newCar);
         }
@@ -172,7 +148,7 @@ class UserController {
 
         return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
 
-    }
+    }*/
 
 
 }

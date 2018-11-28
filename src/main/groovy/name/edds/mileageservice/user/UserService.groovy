@@ -11,7 +11,16 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import java.util.regex.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 
 import static com.mongodb.client.model.Filters.*
 import static com.mongodb.client.model.Updates.*
@@ -95,11 +104,12 @@ class UserService {
     }
 
     /**
-     * Find the user with the specified mail
+     * Find the user with the specified identifier.
      *
-     * @return the User matching the email if found
-     * if not found, returns ??
+     * @return the User matching the identifier if found
+     * if not found, returns null
      */
+
     User findUser(String email) {
         MongoCollection<User> userCollection = setupUserCollection()
         userCollection.find(eq("email", email)).first()
@@ -169,21 +179,30 @@ class UserService {
     }
 
     /**
-     * Create a User from a document
-     * @param document
-     * @return user
+     * Based on solution at http://www.javapractices.com/topic/TopicAction.do?Id=180
+     *
+     * Validate the form of an email address.
      */
-/*    User createUserFromDocument(Document userDocument) {
 
-        if (null == userDocument) {
-            return null
+    boolean isValidEmailAddress(String aEmailAddress) {
+        if (aEmailAddress == null) return false;
+        boolean result = true;
+        try {
+            InternetAddress emailAddr = new InternetAddress(aEmailAddress);
+            if (!hasNameAndDomain(aEmailAddress)) {
+                result = false;
+            }
         }
+        catch (AddressException ex) {
+            result = false;
+        }
+        return result;
+    }
 
-        new User(_id: userDocument._id as ObjectId,
-                lastName: userDocument.lastName as String,
-                firstName: userDocument.firstName as String,
-                email: userDocument.email as String)
-    }*/
+    private boolean hasNameAndDomain(String aEmailAddress) {
+        String[] tokens = aEmailAddress.split("@");
+        return tokens.length == 2 && !tokens[0].isEmpty() && !tokens[1].isEmpty()
+    }
 
 
 }
