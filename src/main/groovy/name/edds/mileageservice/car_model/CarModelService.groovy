@@ -29,12 +29,12 @@ class CarModelService {
     String carCollectionName
 
     /**
-     * Get a list of all cars in the DB
+     * Get a list of all car models in the DB
      * TODO: add paging
      *
-     * @return list of cars
+     * @return list of car models
      */
-    List<CarModel> listCars() {
+    List<CarModel> listCarsModels() {
 
         MongoClient mongoClient = MongoClients.create();
 

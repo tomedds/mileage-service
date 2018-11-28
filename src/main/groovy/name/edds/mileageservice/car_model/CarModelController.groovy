@@ -18,7 +18,7 @@ class CarModelController {
     ResponseEntity<List<CarModel>> getCars() {
 
         return new ResponseEntity<>(
-                carService.listCars(),
+                carService.listCarsModels(),
                 HttpStatus.OK);
 
 
