@@ -24,6 +24,14 @@ repositories {
     mavenCentral()
 }
 
+
+sourceSets {
+    integrationTest {
+        groovy.srcDir file('src/integrationTest/groovy')
+        resources.srcDir file('src/integrationTest/resources')
+    }
+}
+
 bootJar {
     mainClassName = 'org.edds.mileageservice.Application'
 }
@@ -44,12 +52,35 @@ dependencies {
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
 
     implementation('org.codehaus.groovy:groovy')
-
     implementation('org.springframework.boot:spring-boot-devtools')
 
     testImplementation('junit:junit:4.12')
     testImplementation('org.codehaus.groovy:groovy-all:2.4.11')
-
+    testImplementation('io.rest-assured:rest-assured:3.2.0')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 /*	testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc') */
+
+    integrationTestCompile('org.codehaus.groovy:groovy')
+    integrationTestCompile('io.rest-assured:rest-assured:3.2.0')
+    integrationTestCompile('junit:junit:4.12')
+    integrationTestCompile 'commons-collections:commons-collections:3.2.2'
+    integrationTestCompile 'commons-logging:commons-logging:1.2'
+    integrationTestCompile sourceSets.main.output
+    integrationTestCompile configurations.testCompile
+    integrationTestCompile sourceSets.test.output
+    integrationTestRuntime configurations.testRuntime
+
 }
+
+task integrationTest(type: Test, dependsOn: jar) {
+    group 'Verification'
+    description 'Runs the integration tests.'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath =  sourceSets.integrationTest.runtimeClasspath
+    systemProperties['jar.path'] = jar.archivePath
+}
+
+/*
+  We don't want to run integration tests every time
+check.dependsOn integrationTest
+*/

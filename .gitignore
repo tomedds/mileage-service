@@ -28,3 +28,4 @@ build/
 mileage-service.iml
 out/
 README_local.md
+*.iml
