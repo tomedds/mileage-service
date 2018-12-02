@@ -6,7 +6,7 @@ import groovy.transform.TypeChecked
  * Data for a fueling stop
  */
 @TypeChecked
-class Refueling extends Event {
+class Refueling extends ServiceEvent {
 
     float pricePerGallon
     float numberOfGallons

@@ -10,8 +10,6 @@ class User {
 
     /* Codec returns null if this is "id" instead of "id" */
     ObjectId id
-
-
     String lastName
     String firstName
     String email

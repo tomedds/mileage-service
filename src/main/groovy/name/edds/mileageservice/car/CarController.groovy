@@ -1,8 +1,8 @@
 package name.edds.mileageservice.car
 
+
 import groovy.transform.TypeChecked
-import name.edds.mileageservice.car.Car
-import name.edds.mileageservice.car_model.CarModel
+import name.edds.mileageservice.events.Fueling
 import name.edds.mileageservice.user.User
 import name.edds.mileageservice.user.UserService
 import org.bson.types.ObjectId
@@ -31,14 +31,9 @@ class CarController {
  * Get all of the cars for the specified user
  * @return list of Cars
  */
-    @RequestMapping(value = "/{id}/cars", method = RequestMethod.GET)
-    ResponseEntity<List<Car>> getCarsForUser(@PathVariable("id") String id) {
-
-        int debug = 0;
-        return new ResponseEntity<>(
-                carService.listCars(new ObjectId(id)), HttpStatus.OK)
-
-
+    @RequestMapping(value = "/{userId}/cars", method = RequestMethod.GET)
+    ResponseEntity<List<Car>> getCarsForUser(@PathVariable("userId") String userId) {
+        new ResponseEntity<>(carService.listCars(new ObjectId(userId)), HttpStatus.OK)
     }
 /**
  * Add a car to the user.
@@ -90,40 +85,30 @@ class CarController {
      *
      * @return
      */
-    @RequestMapping(value = "/{userId}/cars/fueling}", method = RequestMethod.POST)
-    ResponseEntity<String> addFueling(@PathVariable("userId") String userId, @RequestBody Fueling fueling) {
-
-        ObjectId userObjectId
+    @RequestMapping(value = "/{userId}/cars/{carId}/fueling", method = RequestMethod.POST)
+    ResponseEntity<String> addFueling(@PathVariable("userId") String userId,
+                                      @PathVariable("carId") String carId,
+                                      @RequestBody Fueling fueling) {
         String errMsg
 
         try {
-            userObjectId = new ObjectId(userId)
+            // The userId passed as part of the REST URL needs to be valid but we don't actually use it
+            ObjectId userObjectId = new ObjectId(userId)
+
+            try {
+                // FIXME: for now, always add fueling to default car. This needs to be the currently selected car
+                errMsg = carService.addFueling(userService.getUserCollection(), new ObjectId(carId), fueling)
+
+                if (errMsg.isEmpty()) {
+                    return new ResponseEntity<String>("", HttpStatus.CREATED);
+                }
+            }
+            catch (IllegalArgumentException ex) {
+                errMsg = "car id value is not a valid ObjectId"
+            }
         }
         catch (IllegalArgumentException ex) {
-            errMsg = "id value is not a valid ObjectId"
-        }
-
-
-        if (!errMsg) {
-
-            // get the user document
-            User user = userService.findUser(userObjectId)
-
-            Car defaultCar = carService.findDefaultCar(user)
-
-            // what is the Mongo way to add an item to a list which is a nested document?
-            // with the codec, do we add it to the USer and then save it?
-            if (null == defaultCar) {
-                return new ResponseEntity<String>("Default car not found", HttpStatus.NOT_FOUND);
-            }
-
-            // FIXME: for now, always add fueling to default car. This needs to be the currently selected car
-            errMsg = carService.addFueling(user, defaultCar, fueling)
-
-        }
-
-        if (!errMsg) {
-            return new ResponseEntity<String>("", HttpStatus.CREATED);
+            errMsg = "user id value is not a valid ObjectId"
         }
 
         return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);

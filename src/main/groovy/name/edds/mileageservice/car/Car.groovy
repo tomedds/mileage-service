@@ -2,7 +2,7 @@ package name.edds.mileageservice.car
 
 import groovy.transform.TypeChecked
 import name.edds.mileageservice.car_model.CarModel
-import name.edds.mileageservice.events.Event
+import name.edds.mileageservice.events.ServiceEvent
 import org.bson.types.ObjectId
 
 @TypeChecked
@@ -12,7 +12,7 @@ class Car {
     CarModel carModel
     int mileage
     Date dateAdded
-    List<Event> events = []
+    List<ServiceEvent> events = []
     boolean isDefault
 
     void addEvent(def event) {

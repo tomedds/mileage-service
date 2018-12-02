@@ -4,17 +4,16 @@ import groovy.transform.TypeChecked
 import org.bson.types.ObjectId
 
 /**
- * Data for a fueling stop
+ * Common data for refueling, service, etc
  */
 @TypeChecked
-class Event {
+class ServiceEvent {
 
-    ObjectId id;
+    ObjectId id
     EventType eventType
     Date date
     int odometer
-    float cost
-
+    BigDecimal totalCost
 
 }
 

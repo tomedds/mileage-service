@@ -1,16 +1,22 @@
 package name.edds.mileageservice.car
 
+
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.model.Updates
+import com.mongodb.client.result.UpdateResult
 import groovy.transform.TypeChecked
+import name.edds.mileageservice.events.EventType
+import name.edds.mileageservice.events.Fueling
 import name.edds.mileageservice.user.User
 import name.edds.mileageservice.user.UserService
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import static com.mongodb.client.model.Filters.eq
-import static com.mongodb.client.model.Updates.combine
-import static com.mongodb.client.model.Updates.set
+import static com.mongodb.client.model.Filters.*
+import static com.mongodb.client.model.Updates.*
 
 @TypeChecked
 @Component
@@ -26,11 +32,11 @@ class CarService {
     }
 
 /**
-     * Validate that we have sufficient data to create a new Car
-     *
-     * @param car
-     * @return "" or error messages
-     */
+ * Validate that we have sufficient data to create a new Car
+ *
+ * @param car
+ * @return "" or error messages
+ */
     String validateNewCar(Car car) {
 
         if (null == car.id) {
@@ -59,14 +65,8 @@ class CarService {
      */
 
     List<Car> listCars(ObjectId userid) {
-
-     //   List<Car> cars = new ArrayList<>()
-
-        User user = userService.findUser(userid)
-        return user.cars
-
+        return userService.findUser(userid).cars
     }
-
 
     /**
      * Add a car for this user. These are stored as embedded records within the User record.
@@ -109,7 +109,7 @@ class CarService {
         newCar.dateAdded = new Date()
         user.cars.add(newCar)
 
-        MongoCollection<User> userCollection = userService.setupUserCollection()
+        MongoCollection<User> userCollection = userService.getUserCollection()
 
         userCollection.updateOne(eq(ID_KEY, userId),
                 combine(set("cars", user.cars)))
@@ -127,35 +127,53 @@ class CarService {
         user.cars.each {
             thisCar ->
                 if (thisCar.isDefault) {
-                   return thisCar
+                    return thisCar
                 }
         }
 
-       null  // if no default car found (e.g., new user)
+        null  // if no default car found (e.g., new user)
 
     }
 
-
-    String addFueling(User user, Car car, Fueling fueling) {
-
-        car.addEvent(fueling)
-
-        MongoCollection<User> userCollection = userService.setupUserCollection()
-
-        /* db.students.updateOne(
-   { id: 1, grades: 80 },
-   { $set: { "grades.$" : 82 } }
-)
-*/
-
-/*        userCollection.updateOne( {id: user.id, cars:  },
-                combine(set("cars", user.cars)))
+/**
+ * Add a fueling event to a car
+ *
+ *
+ * @param user
+ * @param car
+ * @param fueling
+ * @return
  */
-        return ""
+
+    String addFueling(MongoCollection<User> userCollection, ObjectId carId, Fueling fueling) {
+
+        fueling.date = new Date()
+        fueling.eventType = EventType.Fueling
+        fueling.id = new ObjectId()
+
+        String errMsg = fueling.isValid()
+
+        if (errMsg.isEmpty()) {
+
+            UpdateResult ur = userCollection.updateOne(
+                    Filters.eq("cars._id", carId),
+                    Updates.push('''cars.$[currentCar].events''', fueling),
+                    new UpdateOptions().arrayFilters(
+                            Collections.singletonList(
+                                    Filters.eq("currentCar._id", carId)))
+            )
+
+            if (1 == ur.modifiedCount) {
+                return ""
+            } else {
+                return "error adding fueling event to car"
+            }
+        } else {
+            // entry is invalid
+            return errMsg
+        }
 
     }
-
-
 
 
 }

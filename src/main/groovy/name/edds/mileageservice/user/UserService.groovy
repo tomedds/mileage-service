@@ -1,31 +1,34 @@
 package name.edds.mileageservice.user
 
-import com.mongodb.MongoClientSettings
+
 import com.mongodb.client.*
 
+import com.mongodb.Block;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import groovy.transform.TypeChecked
+import java.util.List;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress
 import name.edds.mileageservice.Properties
-import name.edds.mileageservice.car.Car
-import name.edds.mileageservice.car.CarService
+import name.edds.mileageservice.mongo.Client
 import org.bson.codecs.configuration.CodecRegistry
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import java.util.regex.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.*;
+import static java.util.Arrays.asList;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-
-import static com.mongodb.client.model.Filters.*
-import static com.mongodb.client.model.Updates.*
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries
 
 @TypeChecked
 @Component
@@ -37,6 +40,9 @@ class UserService {
     @Value('${mileage.mongo.user_collection_name}')
     String userCollectionName
 
+    CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
+            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+
     /**
      * Get a list of all users in the DB
      * TODO: add paging
@@ -45,7 +51,7 @@ class UserService {
      */
     List<User> listUsers() {
 
-        MongoCollection<User> userCollection = setupUserCollection()
+        MongoCollection<User> userCollection = getUserCollection()
 
         List<User> users = new ArrayList<>()
 
@@ -69,7 +75,7 @@ class UserService {
      */
     ObjectId addUser(User user) {
 
-        MongoCollection<User> userCollection = setupUserCollection()
+        MongoCollection<User> userCollection = getUserCollection()
 
         try {
             userCollection.insertOne(user)
@@ -88,7 +94,7 @@ class UserService {
      * if not found, returns ??
      */
     User findUser(ObjectId userObjectId) {
-        MongoCollection<User> userCollection = setupUserCollection()
+        MongoCollection<User> userCollection = getUserCollection()
         userCollection.find(eq("_id", userObjectId)).first()
     }
 
@@ -99,7 +105,7 @@ class UserService {
      * if not found, returns ??
      */
     User getCurrentUser() {
-        MongoCollection<User> userCollection = setupUserCollection()
+        MongoCollection<User> userCollection = getUserCollection()
         userCollection.find(eq("email", Properties.CURRENT_USER_EMAIL)).first();
     }
 
@@ -111,21 +117,13 @@ class UserService {
      */
 
     User findUser(String email) {
-        MongoCollection<User> userCollection = setupUserCollection()
+        MongoCollection<User> userCollection = getUserCollection()
         userCollection.find(eq("email", email)).first()
     }
 
-    MongoCollection<User> setupUserCollection() {
-
-        MongoClient mongoClient = MongoClients.create()
-
-        // create codec registry for POJOs
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-        MongoDatabase mileageDb = mongoClient.getDatabase(dbName).withCodecRegistry(pojoCodecRegistry)
-
-        mileageDb.getCollection(userCollectionName, User.class)
-
+    MongoCollection<User> getUserCollection() {
+        Client.getInstance().getDatabase(dbName).withCodecRegistry(pojoCodecRegistry)
+                .getCollection(userCollectionName, User.class)
     }
 
     /**
