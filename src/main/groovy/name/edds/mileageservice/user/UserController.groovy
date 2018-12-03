@@ -113,7 +113,7 @@ class UserController {
  * @return
  */
 /*    @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
-    ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody Car newCar) {
+    ResponseEntity<String> createCar(@PathVariable("id") String id, @RequestBody Car newCar) {
 
         ObjectId userId
         User user
@@ -137,7 +137,7 @@ class UserController {
 
         *//* add car and make it the default if needed *//*
         if (!errMsg) {
-            errMsg = userService.addCarToUser(userId, newCar);
+            errMsg = userService.createCar(userId, newCar);
         }
 
         if (!errMsg) {

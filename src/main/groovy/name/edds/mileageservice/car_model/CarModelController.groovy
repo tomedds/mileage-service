@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 class CarModelController {
 
     @Autowired
-    CarModelService carService
+    CarModelService carModelService
 
     @RequestMapping(method = RequestMethod.GET)
     ResponseEntity<List<CarModel>> getCars() {
 
         return new ResponseEntity<>(
-                carService.listCarsModels(),
+                carModelService.findCarModels(),
                 HttpStatus.OK);
 
 

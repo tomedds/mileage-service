@@ -2,6 +2,7 @@ package name.edds.mileageservice.car
 
 
 import groovy.transform.TypeChecked
+import name.edds.mileageservice.events.EventService
 import name.edds.mileageservice.events.Fueling
 import name.edds.mileageservice.user.User
 import name.edds.mileageservice.user.UserService
@@ -20,11 +21,13 @@ class CarController {
 
     CarService carService
     UserService userService
+    EventService eventService
 
     @Autowired
-    CarController(CarService carService, UserService userService) {
+    CarController(CarService carService, UserService userService, EventService eventService) {
         this.carService = carService
         this.userService = userService
+        this.eventService = eventService
     }
 
 /**
@@ -67,7 +70,7 @@ class CarController {
         // FIXME: currently the most recently added car is the default
 
         if (!resultStr) {
-            resultStr = carService.addCarToUser(userId, newCar);
+            resultStr = carService.addCar(userId, newCar);
         }
 
         // at this point resultStr is either the id for the new car or an error message
@@ -97,7 +100,7 @@ class CarController {
 
             try {
                 // FIXME: for now, always add fueling to default car. This needs to be the currently selected car
-                errMsg = carService.addFueling(userService.getUserCollection(), new ObjectId(carId), fueling)
+                errMsg = eventService.addFueling(userService.getUserCollection(), new ObjectId(carId), fueling)
 
                 if (errMsg.isEmpty()) {
                     return new ResponseEntity<String>("", HttpStatus.CREATED);

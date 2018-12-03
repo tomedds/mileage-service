@@ -1,23 +1,18 @@
 package name.edds.mileageservice.user
 
-import com.mongodb.client.*
-import com.mongodb.MongoClient
-import groovy.transform.TypeChecked
-import org.springframework.beans.factory.annotation.Autowired
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress
+import com.mongodb.client.MongoCollection
+import groovy.transform.TypeChecked
 import name.edds.mileageservice.Properties
-import name.edds.mileageservice.Client
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
-import static com.mongodb.client.model.Filters.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+
+import javax.mail.internet.AddressException
+import javax.mail.internet.InternetAddress
 
 @TypeChecked
-@Component
+@Service
 class UserService {
 
     @Autowired

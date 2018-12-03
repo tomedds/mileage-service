@@ -2,23 +2,38 @@ package name.edds.mileageservice.car
 
 import groovy.transform.TypeChecked
 import name.edds.mileageservice.car_model.CarModel
+import name.edds.mileageservice.events.EventService
 import name.edds.mileageservice.user.UserService
 import org.bson.types.ObjectId
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit4.SpringRunner
 
 /**
  *  Test the construction and use of a Car
  */
 @TypeChecked
+@RunWith(SpringRunner.class)
+@SpringBootTest
 class CarServiceTest extends GroovyTestCase {
 
-    /**
+    @Autowired
+    UserService userService
+    @Autowired
+    CarRepository carRepository
+
+    CarServiceTest() {
+    }
+
+/**
      * A new Car needs a model and mileage and no events
      */
+    @Test
     void testNewCarValidation() {
 
-        UserService userService = new UserService()
-
-        CarService carService = new CarService(userService)
+        CarService carService = new CarService(userService, carRepository)
         Car newCar = new Car()
 
         String errMsg = carService.validateNewCar(newCar)
