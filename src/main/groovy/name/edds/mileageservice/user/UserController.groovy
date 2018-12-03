@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 
-import static com.mongodb.client.model.Filters.eq
-
 // FIXME: allow lookup for user by either ID or email without specifying type.
 // If it is a value email, use it that way.
 // Otherwise, assume it's an ID
@@ -33,7 +31,7 @@ class UserController {
     ResponseEntity<List<User>> getUsers() {
 
         return new ResponseEntity<>(
-                userService.listUsers(),
+                userService.findUsers(),
                 HttpStatus.OK)
     }
 
@@ -102,7 +100,7 @@ class UserController {
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<String> addUser(@RequestBody User user) {
 
-        ObjectId result = userService.addUser(user)
+        ObjectId result = userService.createUser(user)
 
         return new ResponseEntity<String>(
                 String.valueOf(result),

@@ -1,47 +1,27 @@
 package name.edds.mileageservice.user
 
-
 import com.mongodb.client.*
-
-import com.mongodb.Block;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.UpdateResult;
+import com.mongodb.MongoClient
 import groovy.transform.TypeChecked
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired
+
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress
 import name.edds.mileageservice.Properties
-import name.edds.mileageservice.mongo.Client
+import name.edds.mileageservice.Client
 import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.*;
-import static java.util.Arrays.asList;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
+import static com.mongodb.client.model.Filters.*
 
 @TypeChecked
 @Component
 class UserService {
 
-    @Value('${mileage.mongo.db_name}')
-    String dbName;
-
-    @Value('${mileage.mongo.user_collection_name}')
-    String userCollectionName
-
-    CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+    @Autowired
+    UserRepository userRepository
 
     /**
      * Get a list of all users in the DB
@@ -49,23 +29,8 @@ class UserService {
      *
      * @return list of users
      */
-    List<User> listUsers() {
-
-        MongoCollection<User> userCollection = getUserCollection()
-
-        List<User> users = new ArrayList<>()
-
-        MongoCursor<User> userCursor = userCollection.find().iterator()
-
-        try {
-            while (userCursor.hasNext()) {
-                users.add(userCursor.next())
-            }
-        } finally {
-            userCursor.close();
-        }
-
-        return users
+    List<User> findUsers() {
+        userRepository.findUsers()
     }
 
     /**
@@ -73,18 +38,9 @@ class UserService {
      * @param user
      * @return
      */
-    ObjectId addUser(User user) {
-
-        MongoCollection<User> userCollection = getUserCollection()
-
-        try {
-            userCollection.insertOne(user)
-            return user.id
-        } catch (e) {
-            // TODO: add logger
-            println(e);
-        }
-
+    ObjectId createUser(User user) {
+        // TODO: validate user
+        userRepository.createUser(user)
     }
 
     /**
@@ -94,19 +50,7 @@ class UserService {
      * if not found, returns ??
      */
     User findUser(ObjectId userObjectId) {
-        MongoCollection<User> userCollection = getUserCollection()
-        userCollection.find(eq("_id", userObjectId)).first()
-    }
-
-    /**
-     * Find the user with the specified ID
-     *
-     * @return the User matching the ID if found
-     * if not found, returns ??
-     */
-    User getCurrentUser() {
-        MongoCollection<User> userCollection = getUserCollection()
-        userCollection.find(eq("email", Properties.CURRENT_USER_EMAIL)).first();
+        userRepository.findUser(userObjectId)
     }
 
     /**
@@ -117,13 +61,17 @@ class UserService {
      */
 
     User findUser(String email) {
-        MongoCollection<User> userCollection = getUserCollection()
-        userCollection.find(eq("email", email)).first()
+        userRepository.findUser(email)
     }
 
-    MongoCollection<User> getUserCollection() {
-        Client.getInstance().getDatabase(dbName).withCodecRegistry(pojoCodecRegistry)
-                .getCollection(userCollectionName, User.class)
+    /**
+     * Find the user with the specified ID
+     *
+     * @return the User matching the ID if found
+     * if not found, returns ??
+     */
+    User getCurrentUser() {
+        userRepository.findUser( Properties.CURRENT_USER_EMAIL)
     }
 
     /**
@@ -151,6 +99,16 @@ class UserService {
         String[] tokens = aEmailAddress.split("@");
         return tokens.length == 2 && !tokens[0].isEmpty() && !tokens[1].isEmpty()
     }
+
+
+    /* Service-level method to return collection
+
+     */
+     MongoCollection<User> getUserCollection() {
+        userRepository.getUserCollection()
+    }
+
+
 
 
 }

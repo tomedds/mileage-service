@@ -1,4 +1,4 @@
-package name.edds.mileageservice.mongo
+package name.edds.mileageservice
 
 import com.mongodb.MongoClientOptions
 import com.mongodb.client.MongoClient
