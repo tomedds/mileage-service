@@ -33,7 +33,7 @@ sourceSets {
 }
 
 bootJar {
-    mainClassName = 'org.edds.mileageservice.Application'
+    mainClassName = 'name.edds.mileageservice.Application'
 }
 dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
@@ -60,7 +60,10 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 /*	testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc') */
 
-    integrationTestCompile('org.codehaus.groovy:groovy')
+
+    integrationTestCompile('org.codehaus.groovy:groovy-all:2.4.11')
+    integrationTestCompile('org.springframework.boot:spring-boot-starter-web')
+    integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
     integrationTestCompile('io.rest-assured:rest-assured:3.2.0')
     integrationTestCompile('junit:junit:4.12')
     integrationTestCompile 'commons-collections:commons-collections:3.2.2'
