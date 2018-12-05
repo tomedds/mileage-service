@@ -1,6 +1,5 @@
 package name.edds.mileageservice.car
 
-
 import groovy.transform.TypeChecked
 import name.edds.mileageservice.events.EventService
 import name.edds.mileageservice.events.Fueling
