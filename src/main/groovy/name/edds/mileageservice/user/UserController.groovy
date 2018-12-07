@@ -1,6 +1,10 @@
 package name.edds.mileageservice.user
 
 import groovy.transform.TypeChecked
+import io.swagger.annotations.ApiOperation
+
+import name.edds.mileageservice.car.Car
+import name.edds.mileageservice.car.CarService
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -20,8 +24,14 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/users")
 class UserController {
 
-    @Autowired
     UserService userService
+    CarService carService
+
+    @Autowired
+    UserController(UserService userService, CarService carService) {
+        this.userService = userService
+        this.carService = carService
+    }
 
     /**
      * Get the list of users
@@ -36,10 +46,21 @@ class UserController {
     }
 
     /**
+     * Get all of the cars for the specified user
+     * @return list of Cars
+     */
+    @RequestMapping(value = "/{identifier}/cars", method = RequestMethod.GET)
+    ResponseEntity<List<Car>> getCarsForUser(@PathVariable("identifier") String identifier) {
+        new ResponseEntity<>(carService.listCars(identifier), HttpStatus.OK)
+    }
+
+
+    /**
      * Get the current user
      * FIXME: this will be different when we use authentication
      * @return
      */
+    @ApiOperation(value = "Get current user", notes = "")
     @RequestMapping(value = "/currentUser", method = RequestMethod.GET)
     ResponseEntity<User> getCurrentUser() {
 
@@ -92,7 +113,6 @@ class UserController {
 
     }
 
-
 /**
  * Create a new user
  * @return
@@ -104,49 +124,53 @@ class UserController {
 
         return new ResponseEntity<String>(
                 String.valueOf(result),
-                HttpStatus.CREATED);
+                HttpStatus.CREATED)
     }
 
-/**
- * Add a car to the user.
- * FIXME: make sure the make/model/year combination is valid
- * @return
- */
-/*    @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
-    ResponseEntity<String> createCar(@PathVariable("id") String id, @RequestBody Car newCar) {
+    /**
+     * Add a car to the user.
+     * FIXME: make sure the make/model/year combination is valid
+     * @return
+     */
+    @RequestMapping(value = "/{identifier}/cars", method = RequestMethod.POST)
+    ResponseEntity<String> addCarToUser(@PathVariable("userId") String userId, @RequestBody Car newCar) {
 
-        ObjectId userId
+        ObjectId userObjectId
         User user
-        String errMsg
+        String resultStr
 
         try {
-            userId = new ObjectId(id)
+            userObjectId = new ObjectId(userId)
         }
         catch (IllegalArgumentException ex) {
-            errMsg = "id value is not a valid ObjectId"
+            resultStr = "id value is not a valid ObjectId"
         }
 
-        if (!errMsg) {
+        if (!resultStr) {
             // confirm that user exists
-            user = userService.findUser(userId)
+            user = userService.findUser(userObjectId)
 
             if (null == user) {
                 return new ResponseEntity<String>("User not found", HttpStatus.NOT_FOUND);
             }
         }
 
-        *//* add car and make it the default if needed *//*
-        if (!errMsg) {
-            errMsg = userService.createCar(userId, newCar);
+        /* add car and make it the default if needed */
+        // FIXME: currently the most recently added car is the default
+
+        if (!resultStr) {
+            resultStr = carService.addCar(userObjectId, newCar);
         }
 
-        if (!errMsg) {
-            return new ResponseEntity<String>("", HttpStatus.CREATED);
+        // at this point resultStr is either the id for the new car or an error message
+
+        if (ObjectId.isValid(resultStr)) {
+            return new ResponseEntity<String>("{\"id\": \"$resultStr\"}".toString(), HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(resultStr, HttpStatus.BAD_REQUEST);
 
-    }*/
+    }
 
 
 }

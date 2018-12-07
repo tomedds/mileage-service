@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*
 
 /* Manage Car resources */
 
-@TypeChecked
 @RestController
-@RequestMapping("/api/users")
+@TypeChecked
+@RequestMapping("/api/cars")
 class CarController {
 
     CarService carService
@@ -29,57 +29,72 @@ class CarController {
         this.eventService = eventService
     }
 
-/**
- * Get all of the cars for the specified user
- * @return list of Cars
- */
-    @RequestMapping(value = "/{userId}/cars", method = RequestMethod.GET)
-    ResponseEntity<List<Car>> getCarsForUser(@PathVariable("userId") String userId) {
-        new ResponseEntity<>(carService.listCars(new ObjectId(userId)), HttpStatus.OK)
+    /**
+     * Update a car
+     *
+     */
+
+    @RequestMapping(value = "/{carId}", method = RequestMethod.PUT)
+    ResponseEntity<Car> updateCar(@PathVariable("carId") String carId, @RequestBody Car car) {
+
+        return new ResponseEntity<Car>(car, HttpStatus.NOT_IMPLEMENTED)
+        /*
+        String errMsg = carService.updateCar(carId)
+
+        if (errMSg) {
+            return new ResponseEntity<Car>(car, HttpStatus.OK)
+        } else {
+            return new ResponseEntity<Car>(errMsg, HttpStatus.BAD_REQUEST)
+        }
+        */
     }
-/**
- * Add a car to the user.
- * FIXME: make sure the make/model/year combination is valid
- * @return
- */
-    @RequestMapping(value = "/{id}/cars", method = RequestMethod.POST)
-    ResponseEntity<String> addCarToUser(@PathVariable("id") String id, @RequestBody Car newCar) {
 
-        ObjectId userId
-        User user
-        String resultStr
+    /**
+     * Delete a car
+     *
+     */
 
-        try {
-            userId = new ObjectId(id)
+    @RequestMapping(value = "/{carId}", method = RequestMethod.DELETE)
+    ResponseEntity<String> deleteCar(@PathVariable("carId") String carId) {
+
+        return new ResponseEntity<String>("", HttpStatus.NOT_IMPLEMENTED)
+        /*
+        String errMsg = carService.delete(carId)
+
+        if (errMSg) {
+            return new ResponseEntity<Car>(car, HttpStatus.OK)
+        } else {
+            return new ResponseEntity<Car>(errMsg, HttpStatus.BAD_REQUEST)
         }
-        catch (IllegalArgumentException ex) {
-            resultStr = "id value is not a valid ObjectId"
+        */
+    }
+
+    /**
+     * Update a car
+     *
+     * @return
+     */
+    @RequestMapping(value = "/{carId}", method = RequestMethod.GET)
+    ResponseEntity<Car> getCar(@PathVariable("carId") String carId) {
+        Car car = carService.find(carId)
+        if (car) {
+            return new ResponseEntity<Car>(car, HttpStatus.OK)
+        } else {
+            return new ResponseEntity<Car>(new Car(), HttpStatus.NOT_FOUND)
         }
+    }
 
-        if (!resultStr) {
-            // confirm that user exists
-            user = userService.findUser(userId)
-
-            if (null == user) {
-                return new ResponseEntity<String>("User not found", HttpStatus.NOT_FOUND);
-            }
-        }
-
-        /* add car and make it the default if needed */
-        // FIXME: currently the most recently added car is the default
-
-        if (!resultStr) {
-            resultStr = carService.addCar(userId, newCar);
-        }
-
-        // at this point resultStr is either the id for the new car or an error message
-
-        if (ObjectId.isValid(resultStr)) {
-            return new ResponseEntity<String>("{\"id\": \"$resultStr\"}".toString(), HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<String>(resultStr, HttpStatus.BAD_REQUEST);
-
+    /**
+     * Get a list of all cars
+     *
+     * FIXME: this needs paging
+     *
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    ResponseEntity<List<Car>> getAllCars() {
+        List<Car> cars = new ArrayList<>()
+        return new ResponseEntity<List<Car>>(cars, HttpStatus.NOT_IMPLEMENTED)
     }
 
     /**
@@ -87,7 +102,7 @@ class CarController {
      *
      * @return
      */
-    @RequestMapping(value = "/{userId}/cars/{carId}/fueling", method = RequestMethod.POST)
+    @RequestMapping(value = "/{carId}/fueling", method = RequestMethod.POST)
     ResponseEntity<String> addFueling(@PathVariable("userId") String userId,
                                       @PathVariable("carId") String carId,
                                       @RequestBody Fueling fueling) {

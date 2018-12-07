@@ -1,13 +1,7 @@
 package name.edds.mileageservice.car
 
-import com.mongodb.client.MongoCollection
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.UpdateOptions
-import com.mongodb.client.model.Updates
-import com.mongodb.client.result.UpdateResult
+
 import groovy.transform.TypeChecked
-import name.edds.mileageservice.events.EventType
-import name.edds.mileageservice.events.Fueling
 import name.edds.mileageservice.user.User
 import name.edds.mileageservice.user.UserService
 import org.bson.types.ObjectId
@@ -60,9 +54,20 @@ class CarService {
      * @return
      */
 
-    List<Car> listCars(ObjectId userid) {
-        return userService.findUser(userid).cars
+    List<Car> listCars(String identifier) {
+        return userService.findUser(identifier).cars
     }
+
+
+    /**
+     * List cars for the specified user
+     * @return
+     */
+
+    Car find(String identifier) {
+        carRepository.find(new ObjectId(identifier))
+    }
+
 
     /**
      * Add a car for this user. These are stored as embedded records within the User record.
@@ -89,7 +94,7 @@ class CarService {
             return "user not found"
         }
 
-        carRepository.createCar(userService.getUserCollection(), user, newCar)
+        carRepository.create(userService.getUserCollection(), user, newCar)
     }
 
     /**
@@ -109,8 +114,6 @@ class CarService {
         null  // if no default car found (e.g., new user)
 
     }
-
-
 
 
 }

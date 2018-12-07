@@ -1,6 +1,7 @@
 package name.edds.mileageservice.user
 
 import groovy.transform.TypeChecked
+
 import org.junit.Test
 
 /**

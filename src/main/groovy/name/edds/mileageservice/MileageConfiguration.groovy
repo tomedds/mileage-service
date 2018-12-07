@@ -24,12 +24,14 @@ class MileageConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    Docket api() {
+    Docket mileageApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("name.edds.mileageservice"))
-                .paths(PathSelectors.ant("/api/*"))
+                .paths(PathSelectors.ant("/api/**"))
                 .build()
+                .ignoredParameterTypes(MetaClass.class)
+                .ignoredParameterTypes(org.bson.types.ObjectId.class)
                 .apiInfo(apiInfo())
     }
 
