@@ -27,7 +27,6 @@ repositories {
 
 sourceSets {
     integrationTest {
-        groovy.srcDir file('src/integrationTest/groovy')
         resources.srcDir file('src/integrationTest/resources')
     }
 }
