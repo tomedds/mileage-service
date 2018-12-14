@@ -19,7 +19,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  *
  */
 @Repository
-class CarModelRepository {
+public class CarModelRepository {
 
     @Value("${mileage.mongo.db_name}")
     String dbName;

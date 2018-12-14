@@ -16,7 +16,7 @@ import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 @Repository
-class CarRepository {
+public class CarRepository {
 
     UserRepository userRepository;
 

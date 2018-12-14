@@ -13,7 +13,7 @@ import java.util.List;
 @TypeChecked
 @RestController
 @RequestMapping("/api/carModels")
-class CarModelController {
+public class CarModelController {
 
     CarModelService carModelService;
 

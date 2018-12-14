@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class User {
+public class User {
 
     /* Codec returns null if this is "id" instead of "id" */
     private ObjectId id;

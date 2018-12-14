@@ -1,6 +1,6 @@
 package name.edds.mileageservice.events;
 
-enum EventType {
+public enum EventType {
     FUELING,
     Service,
     Repairs

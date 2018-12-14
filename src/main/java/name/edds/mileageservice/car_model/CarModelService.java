@@ -8,7 +8,7 @@ import java.util.List;
 
 @TypeChecked
 @Service
-class CarModelService {
+public class CarModelService {
 
     @Autowired
     CarModelRepository carModelRepository;

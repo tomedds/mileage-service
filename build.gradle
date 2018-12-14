@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-group = 'sas.home.edds'
+group = 'name.edds'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
@@ -70,6 +70,11 @@ dependencies {
     integrationTestCompile('junit:junit:4.12')
     integrationTestCompile 'commons-collections:commons-collections:3.2.2'
     integrationTestCompile 'commons-logging:commons-logging:1.2'
+    integrationTestCompile("io.springfox:springfox-swagger2:2.9.2")
+
+    integrationTestCompile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.8.2'
+    integrationTestCompile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
+
     integrationTestCompile sourceSets.main.output
     integrationTestCompile configurations.testCompile
     integrationTestCompile sourceSets.test.output
@@ -82,6 +87,7 @@ task integrationTest(type: Test, dependsOn: jar) {
     description 'Runs the integration tests.'
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath =  sourceSets.integrationTest.runtimeClasspath
+    classpath += sourceSets.main.runtimeClasspath
     systemProperties['jar.path'] = jar.archivePath
 }
 
