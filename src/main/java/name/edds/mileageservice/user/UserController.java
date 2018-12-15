@@ -1,6 +1,5 @@
 package name.edds.mileageservice.user;
 
-import groovy.transform.TypeChecked;
 import io.swagger.annotations.ApiOperation;
 import name.edds.mileageservice.Formatter;
 import name.edds.mileageservice.car.Car;
@@ -14,10 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
-// FIXME: allow lookup for user by either ID or email without specifying type.
-// If it is a value email, use it that way.
-// Otherwise, assume it's an ID
 
 @RestController
 @RequestMapping("/api/users")
@@ -38,7 +33,7 @@ public final class UserController {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<User>> findUsers() {
 
         return new ResponseEntity<>(
                 userService.findUsers(),
