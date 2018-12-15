@@ -103,7 +103,6 @@ public final class UserController {
 
         if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
-
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -118,11 +117,12 @@ public final class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> addUser(@RequestBody User user) {
 
-        ObjectId result = userService.createUser(user);
+        Optional<ObjectId> result = userService.createUser(user);
 
-        return new ResponseEntity<>(
-                String.valueOf(result),
-                HttpStatus.CREATED);
+        return result.isPresent() ? new ResponseEntity<>( String.valueOf(result.get()), HttpStatus.CREATED) :
+                new ResponseEntity<>( result.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+
     }
 
     /**

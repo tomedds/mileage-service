@@ -38,7 +38,7 @@ public final class UserService {
      * @param user
      * @return
      */
-    public ObjectId createUser(User user) {
+    public Optional<ObjectId> createUser(User user) {
         // TODO: validate user
         return userRepository.createUser(user);
     }

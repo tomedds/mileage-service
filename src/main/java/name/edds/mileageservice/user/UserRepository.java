@@ -53,25 +53,22 @@ public class UserRepository {
      * @param user
      * @return
      */
-    public ObjectId createUser(User user) {
+    public Optional<ObjectId> createUser(User user) {
 
         MongoCollection<User> userCollection = getUserCollection();
 
         try {
+            ObjectId newId = new ObjectId();
+            user.set_id(newId);
             userCollection.insertOne(user);
-            return user.getId();
+            int debugCheckpoint1 = 1;
+            return Optional.of(user.get_id());
         } catch (MongoWriteException e) {
             // TODO: add logger
             println(e);
-            return null;
+            return Optional.empty();
         }
 
-
-        /*            * @throws com.mongodb.MongoWriteException        if the write failed due some other failure specific to the insert command
-         * @throws com.mongodb.MongoWriteConcernException if the write failed due being unable to fulfil the write concern
-         * @throws com.mongodb.MongoException
-
-         */
     }
 
     /**

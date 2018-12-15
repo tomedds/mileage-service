@@ -45,7 +45,7 @@ public class CarRepository {
         updatedCars.add(newCar);
         User updatedUser = new User(user, updatedCars);
 
-        userCollection.updateOne(eq("_id", updatedUser.getId()),
+        userCollection.updateOne(eq("_id", updatedUser.get_id()),
                 combine(set("cars", updatedUser.getCars())));
 
         return newCar.getId().toString();

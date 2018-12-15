@@ -17,6 +17,9 @@ public final class Car {
     private List<ServiceEvent> events = new ArrayList<>();
     private boolean isDefault;
 
+    public Car() {
+    }
+
     public Car(ObjectId id, CarModel carModel, int mileage, Date dateAdded, List<ServiceEvent> events, boolean isDefault) {
         this.id = id;
         this.carModel = carModel;
@@ -76,5 +79,29 @@ public final class Car {
 
     public boolean isDefault() {
         return isDefault;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
+    public void setCarModel(CarModel carModel) {
+        this.carModel = carModel;
+    }
+
+    public void setMileage(int mileage) {
+        this.mileage = mileage;
+    }
+
+    public void setDateAdded(Date dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public void setEvents(List<ServiceEvent> events) {
+        this.events = events;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 }
