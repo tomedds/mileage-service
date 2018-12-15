@@ -1,9 +1,12 @@
 package name.edds.mileageservice.car;
 
+import name.edds.mileageservice.Formatter;
 import name.edds.mileageservice.user.User;
 import name.edds.mileageservice.user.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,28 +25,62 @@ public final class CarService {
         this.carRepository = carRepository;
     }
 
+
+    /**
+     * Add a new car to the database
+     *
+     * @param userObjectId
+     * @param carDto
+     * @return
+     */
+
+    public ResponseEntity<String> addNewCar(ObjectId userObjectId, CarDto carDto) {
+
+        String validationMessage = this.validateDto(carDto);
+
+        if (validationMessage.isEmpty()) {
+
+            Optional<User> user = userService.findUser(userObjectId);
+
+            if (user.isPresent()) {
+
+                /* add car and make it the default */
+                // FIXME: currently the most recently added car is the default
+
+                String newCarId = carRepository.create(userService.getUserCollection(), user.get(), new Car(carDto));
+
+                if (ObjectId.isValid(newCarId)) {
+                    return new ResponseEntity<>("{\"id\": \"newCarId\"}", HttpStatus.CREATED);
+                } else {
+                    return new ResponseEntity<>(Formatter.formatErrorAsJson("create failed for new car"), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                return new ResponseEntity<>(Formatter.formatErrorAsJson("User not found"), HttpStatus.NOT_FOUND);
+            }
+
+        } else {
+            // DTO has invalid data
+            return new ResponseEntity<>("{\"id\": \"validationMessage\"}", HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+
     /**
      * Validate that we have sufficient data to create a new Car
      *
-     * @param car
+     * @param carDto
      * @return "" or error messages
      */
-    public String validateNewCar(Car car) {
 
-        if (null == car.getId()) {
-            return "Car is missing an ID";
-        }
+    public String validateDto(CarDto carDto) {
 
-        if (null == car.getCarModel()) {
+        if (null == carDto.getCarModel()) {
             return "Car is missing model information";
         }
 
-        if (0 >= car.getMileage()) {
+        if (0 >= carDto.getMileage()) {
             return "Mileage must be greater than zero";
-        }
-
-        if (null != car.getEvents() && 0 < car.getEvents().size()) {
-            return "A new car should not have any events";
         }
 
         return "";
@@ -76,32 +113,6 @@ public final class CarService {
         return carRepository.find(new ObjectId(identifier));
     }
 
-
-    /**
-     * Add a car for this user. These are stored as embedded records within the User record.
-     * If this car is going to be the default, we need to reset the flag for any current default car
-     *
-     * @return
-     */
-    public String addCar(ObjectId userId, CarDto newCarDto) {
-
-        /* Validate parameters */
-
-        Car newCar = new Car(newCarDto);
-        String message = this.validateNewCar(newCar);
-
-        if (!message.isEmpty()) {
-            return message;
-        }
-
-        Optional<User> user = userService.findUser(userId);
-
-        if (!user.isPresent()) {
-            return "user not found";
-        }
-
-        return carRepository.create(userService.getUserCollection(), user.get(), newCar);
-    }
 
     /**
      * Find the default car for this user

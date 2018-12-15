@@ -6,11 +6,8 @@ public class CarModel {
     ObjectId id;
     String make;
     String model;
-    // use String for year so we match the imported data
+    // use String for yearso we match the data obtained from external source
     String year;
-
-    public CarModel() {
-    }
 
     public CarModel(String make, String model, String year) {
         this.make = make;

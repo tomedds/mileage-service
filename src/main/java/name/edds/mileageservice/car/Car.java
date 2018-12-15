@@ -17,19 +17,20 @@ public final class Car {
     private List<ServiceEvent> events = new ArrayList<>();
     private boolean isDefault;
 
-    public Car() {
-    }
-
-    public Car(ObjectId id, CarModel carModel, int mileage, Date dateAdded, List<ServiceEvent> events, boolean isDefault) {
-        this.id = id;
-        this.carModel = carModel;
-        this.mileage = mileage;
-        this.dateAdded = dateAdded;
-        this.events = events;
-        this.isDefault = isDefault;
-    }
-
+    /**
+     * Create a new car from the DTO after validation
+     * @param carDto
+     */
     public Car(CarDto carDto) {
+
+        if (null == carDto.getCarModel()) {
+            throw new IllegalStateException("Car is missing carModel.");
+        }
+
+        if (0 >= carDto.getMileage()) {
+            throw new IllegalStateException("Mileage must be greater than zero");
+        }
+
         this.id = new ObjectId();
         this.dateAdded = new Date();
         this.mileage = carDto.getMileage();

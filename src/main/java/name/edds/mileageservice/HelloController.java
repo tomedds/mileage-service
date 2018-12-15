@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 /* Top level controller that says Hello. Used in testing. */
 
 @RestController
-@RequestMapping("/apis")
+@RequestMapping("/api")
 public class HelloController {
 
     /**
      * Update a car
      */
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     ResponseEntity<String> sayHello() {
         return new ResponseEntity<>("Hello", HttpStatus.OK);
     }

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 
 @Service
-public final class UserService {
+public class UserService {
 
     UserRepository userRepository;
 
@@ -70,11 +70,11 @@ public final class UserService {
      * @return the User matching the ID if found
      * if not found, returns ??
      */
-    public User getCurrentUser() {
+    public Optional<User> getCurrentUser() {
 
         Optional<User> user = userRepository.findUser(Properties.CURRENT_USER_EMAIL);
         if (user.isPresent()) {
-            return user.get();
+            return user;
         }
         else {
             throw new IllegalStateException("unable to find current user");
