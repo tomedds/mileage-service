@@ -1,14 +1,11 @@
 package name.edds.mileageservice.user;
 
-import com.mongodb.MongoClient;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import name.edds.mileageservice.Client;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
+import name.edds.mileageservice.DbService;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -17,35 +14,12 @@ import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 import static jdk.nashorn.internal.objects.Global.println;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @Repository
 public class UserRepository {
 
-    @Value("${mileage.mongo.db_name}")
-    String dbName;
-
-    @Value("${mileage.mongo.user_collection_name}")
-    String userCollectionName;
-
-    CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-
-    public User test1() {
-        User user1 = new User("last", "first", "email@example.com", null);
-        return user1;
-    }
-    /**
-     * Get the collection for use with queries
-     *
-     * @return
-     */
-    public MongoCollection<User> getUserCollection() {
-       return Client.getInstance()
-                .getDatabase(dbName).withCodecRegistry(pojoCodecRegistry)
-                .getCollection(userCollectionName, User.class);
-    }
+    @Autowired
+    DbService dbService;
 
     /**
      * Add a new user to the DB
@@ -55,17 +29,16 @@ public class UserRepository {
      */
     public Optional<ObjectId> createUser(User user) {
 
-        MongoCollection<User> userCollection = getUserCollection();
+        MongoCollection<User> userCollection = dbService.getUserCollection();
 
         try {
             ObjectId newId = new ObjectId();
             user.set_id(newId);
             userCollection.insertOne(user);
-            int debugCheckpoint1 = 1;
             return Optional.of(user.get_id());
-        } catch (MongoWriteException e) {
+        } catch (MongoWriteException ex) {
             // TODO: add logger
-            println(e);
+            println(ex);
             return Optional.empty();
         }
 
@@ -79,7 +52,7 @@ public class UserRepository {
      */
     public List<User> findUsers() {
 
-        MongoCollection<User> userCollection = getUserCollection();
+        MongoCollection<User> userCollection = dbService.getUserCollection();
 
         List<User> users = new ArrayList<>();
 
@@ -103,7 +76,7 @@ public class UserRepository {
      * if not found, returns ??
      */
     public Optional<User> findUser(ObjectId userObjectId) {
-        MongoCollection<User> userCollection = getUserCollection();
+        MongoCollection<User> userCollection = dbService.getUserCollection();
         User user = userCollection.find(eq("_id", userObjectId)).first();
         return (null != user) ? Optional.of(user) : Optional.empty();
 
@@ -117,7 +90,7 @@ public class UserRepository {
      */
 
     public Optional<User> findUser(String email) {
-        MongoCollection<User> userCollection = getUserCollection();
+        MongoCollection<User> userCollection = dbService.getUserCollection();
         User user = userCollection.find(eq("email", email)).first();
         return (null != user) ? Optional.of(user) : Optional.empty();
     }

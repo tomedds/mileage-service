@@ -1,6 +1,5 @@
 package name.edds.mileageservice.user;
 
-import com.mongodb.client.MongoCollection;
 import name.edds.mileageservice.Properties;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class UserService {
@@ -24,7 +22,7 @@ public class UserService {
 
     /**
      * Get a list of all users in the DB
-     * TODO: add paging
+     * FIXME: add paging using start and count parameters to work with Mongo cursor.
      *
      * @return list of users
      */
@@ -38,8 +36,29 @@ public class UserService {
      * @param user
      * @return
      */
-    public Optional<ObjectId> createUser(User user) {
-        // TODO: validate user
+    public Optional<ObjectId> createUser(User user) throws InvalidUserException {
+
+        if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+            throw new InvalidUserException("first name is missing.");
+        }
+
+        if (user.getLastName() == null || user.getLastName().isEmpty()) {
+            throw new InvalidUserException("last name is missing.");
+        }
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new InvalidUserException("email is missing.");
+        }
+
+        if (!isValidEmailAddress(user.getEmail())) {
+            throw new InvalidUserException("email is invalid.");
+        }
+
+        // Cars can be empty but no null
+        if (user.getCars() == null) {
+            throw new InvalidUserException("list of cars is null.");
+        }
+
         return userRepository.createUser(user);
     }
 
@@ -67,6 +86,8 @@ public class UserService {
     /**
      * Find the user with the specified ID
      *
+     * FIXME: this needs to come from a real source instead of the current hack.
+     *
      * @return the User matching the ID if found
      * if not found, returns ??
      */
@@ -75,8 +96,7 @@ public class UserService {
         Optional<User> user = userRepository.findUser(Properties.CURRENT_USER_EMAIL);
         if (user.isPresent()) {
             return user;
-        }
-        else {
+        } else {
             throw new IllegalStateException("unable to find current user");
         }
     }
@@ -103,9 +123,17 @@ public class UserService {
 
     private boolean hasNameAndDomain(String aEmailAddress) {
         String[] tokens = aEmailAddress.split("@");
-        return tokens.length == 2 && !tokens[0].isEmpty() && !tokens[1].isEmpty();
-    }
+        if (2 > tokens.length || tokens[0].isEmpty() || tokens[1].isEmpty()) {
+            return false;
+        }
 
+        String[] domainParts = tokens[1].split("\\.");
+        if (2 > domainParts.length) {
+            return false;
+        }
+
+        return true;
+    }
 
 
 }

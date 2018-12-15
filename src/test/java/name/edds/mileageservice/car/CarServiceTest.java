@@ -96,7 +96,7 @@ public class CarServiceTest {
 
         User testUser = new User("testLast", "testFirst", "user@example.com", new ArrayList<Car>());
         CarDto carDto = new CarDto(basicCarModel, 123, Boolean.TRUE);
-        Car testCar = new Car(carDto);
+
         ObjectId userObjectId = new ObjectId();
 
         when(mockUserService.findUser(userObjectId)).thenReturn(Optional.of(testUser));

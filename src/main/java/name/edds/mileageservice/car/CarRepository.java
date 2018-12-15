@@ -61,7 +61,7 @@ public class CarRepository {
      * @return the Car matching the ID if found
      */
     Optional<Car> find(ObjectId objectId) {
-        User userWithCar = userRepository.getUserCollection().find(eq("cars._id", objectId)).first();
+        User userWithCar = dbService.getUserCollection().find(eq("cars._id", objectId)).first();
 
         return userWithCar.getCars().stream().filter(
                 car ->

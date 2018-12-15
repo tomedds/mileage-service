@@ -117,11 +117,14 @@ public final class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> addUser(@RequestBody User user) {
 
-        Optional<ObjectId> result = userService.createUser(user);
-
-        return result.isPresent() ? new ResponseEntity<>(String.valueOf(result.get()), HttpStatus.CREATED) :
-                new ResponseEntity<>(result.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
-
+        try {
+            Optional<ObjectId> result = userService.createUser(user);
+            return result.isPresent() ? new ResponseEntity<>(String.valueOf(result.get()), HttpStatus.CREATED) :
+                    new ResponseEntity<>(result.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch (InvalidUserException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
     }
 
