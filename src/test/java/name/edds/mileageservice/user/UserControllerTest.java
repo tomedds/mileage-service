@@ -31,6 +31,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest()
 public class UserControllerTest {
 
+    @Test
+    public void placeHolder() {
+
+        // simple test to get build to work
+
+        Assert.assertTrue(Boolean.TRUE);
+    }
     /* Integrate this:
     @Test
     public void invalidUserIdShouldGiveErrorMessage() {

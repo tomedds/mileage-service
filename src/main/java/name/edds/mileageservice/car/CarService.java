@@ -47,10 +47,10 @@ public final class CarService {
                 /* add car and make it the default */
                 // FIXME: currently the most recently added car is the default
 
-                String newCarId = carRepository.create(userService.getUserCollection(), user.get(), new Car(carDto));
+                String newCarId = carRepository.create(user.get(), new Car(carDto));
 
                 if (ObjectId.isValid(newCarId)) {
-                    return new ResponseEntity<>("{\"id\": \"newCarId\"}", HttpStatus.CREATED);
+                    return new ResponseEntity<>("{\"id\": \"" + newCarId + "\"}", HttpStatus.CREATED);
                 } else {
                     return new ResponseEntity<>(Formatter.formatErrorAsJson("create failed for new car"), HttpStatus.INTERNAL_SERVER_ERROR);
                 }
@@ -60,7 +60,7 @@ public final class CarService {
 
         } else {
             // DTO has invalid data
-            return new ResponseEntity<>("{\"id\": \"validationMessage\"}", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Formatter.formatErrorAsJson(validationMessage), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -75,6 +75,7 @@ public final class CarService {
 
     public String validateDto(CarDto carDto) {
 
+        // TODO: add more detailed validation of carModel
         if (null == carDto.getCarModel()) {
             return "Car is missing model information";
         }

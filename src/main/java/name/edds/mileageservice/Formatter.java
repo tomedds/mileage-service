@@ -8,7 +8,7 @@ public class Formatter {
      * @return
      */
    public static String formatErrorAsJson(String msg) {
-        return "{\"error\", \"" +  msg + "\"}";
+        return "{\"error\": \"" +  msg + "\"}";
     }
 
 }

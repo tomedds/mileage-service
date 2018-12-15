@@ -107,11 +107,5 @@ public class UserService {
     }
 
 
-    /* Service-level method to return collection
-
-     */
-    public MongoCollection<User> getUserCollection() {
-        return userRepository.getUserCollection();
-    }
 
 }

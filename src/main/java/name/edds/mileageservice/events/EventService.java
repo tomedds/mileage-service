@@ -1,5 +1,6 @@
 package name.edds.mileageservice.events;
 
+import name.edds.mileageservice.DbService;
 import name.edds.mileageservice.car.Car;
 import name.edds.mileageservice.car.CarService;
 import name.edds.mileageservice.user.User;
@@ -13,13 +14,12 @@ import java.util.Optional;
 public final class EventService {
 
     EventRepository eventRepository;
-    UserService userService;
     CarService carService;
+    DbService dbService;
 
     @Autowired
-    public EventService(EventRepository eventRepository, UserService userService, CarService carService) {
+    public EventService(EventRepository eventRepository, UserService userService, CarService carService, DbService dbService) {
         this.eventRepository = eventRepository;
-        this.userService = userService;
         this.carService = carService;
     }
 
@@ -31,7 +31,7 @@ public final class EventService {
 
         Optional<Car> defaultCar = carService.findDefaultCar(user);
         if (defaultCar.isPresent()) {
-            return eventRepository.createFueling(userService.getUserCollection(), defaultCar.get().getId(), new Fueling(fuelingDto));
+            return eventRepository.createFueling(dbService.getUserCollection(), defaultCar.get().getId(), new Fueling(fuelingDto));
         } else {
             throw new IllegalStateException("no default car found for user=" + user.getEmail());
         }

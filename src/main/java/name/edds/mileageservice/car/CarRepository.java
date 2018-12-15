@@ -1,6 +1,7 @@
 package name.edds.mileageservice.car;
 
 import com.mongodb.client.MongoCollection;
+import name.edds.mileageservice.DbService;
 import name.edds.mileageservice.user.User;
 import name.edds.mileageservice.user.UserRepository;
 import org.bson.types.ObjectId;
@@ -18,10 +19,12 @@ import static com.mongodb.client.model.Updates.set;
 @Repository
 public class CarRepository {
 
+    DbService dbService;
     UserRepository userRepository;
 
     @Autowired
-    public CarRepository(UserRepository userRepository) {
+    public CarRepository(DbService dbService, UserRepository userRepository) {
+        this.dbService = dbService;
         this.userRepository = userRepository;
     }
 
@@ -29,11 +32,12 @@ public class CarRepository {
      * Add a car for this user. These are stored as embedded records within the User record.
      * If this car is going to be the default, we need to reset the flag for any current default car
      *
-     * @return
+     * @return id for new car
      */
-    String create(MongoCollection userCollection, User user, Car newCar) {
+    String create(User user, Car newCar) {
 
-        /* reset the default flag if needed */
+        MongoCollection userCollection = dbService.getUserCollection();
+                /* reset the default flag if needed */
 
         List<Car> updatedCars = new ArrayList<>();
 
