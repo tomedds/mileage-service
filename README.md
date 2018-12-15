@@ -35,15 +35,14 @@ You may need to run LoadData to reset the collection and loads the car data into
 
 Run the main application using the JAR built by Spring Boot.
 
-### REST API
+### Documentation
 
- `GET http://localhost:8080/api/car_models` - fetch the list of car models 
+The project provides API details using Swagger UI. Currently this is available after the application has started
+by going to 
 
+ `http://localhost:8081/swagger-ui.html`
 
- `GET http://localhost:8080/api/users` - fetch the list of users
-
- `POST http://localhost:8080/api/users` - create a user
-
+Work is underway to provide static Swagger documentation.
 
 ## Built With
 
