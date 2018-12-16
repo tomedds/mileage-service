@@ -2,9 +2,12 @@ package name.edds.mileageservice.user;
 
 import name.edds.mileageservice.Properties;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.el.MethodNotFoundException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.List;
@@ -14,6 +17,8 @@ import java.util.Optional;
 public class UserService {
 
     UserRepository userRepository;
+
+    Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -85,7 +90,7 @@ public class UserService {
 
     /**
      * Find the user with the specified ID
-     *
+     * <p>
      * FIXME: this needs to come from a real source instead of the current hack.
      *
      * @return the User matching the ID if found
@@ -107,18 +112,26 @@ public class UserService {
      * Validate the form of an email address.
      */
 
-    public boolean isValidEmailAddress(String aEmailAddress) {
-        if (aEmailAddress == null) return false;
-        boolean result = true;
+    public boolean isValidEmailAddress(String emailAddr) {
+
+        LOGGER.debug("validating [" + emailAddr + "] as an email address.");
+
+        if (emailAddr == null) {
+            return false;
+        }
+
+        boolean isValid = true;
+
         try {
-            InternetAddress emailAddr = new InternetAddress(aEmailAddress);
-            if (!hasNameAndDomain(aEmailAddress)) {
-                result = false;
+            InternetAddress emailAddr2 = new InternetAddress(emailAddr);
+            LOGGER.debug("successfully created [" + emailAddr2.toString() + "] as an email address.");
+            if (!hasNameAndDomain(emailAddr)) {
+                isValid = false;
             }
         } catch (AddressException ex) {
-            result = false;
+            isValid = false;
         }
-        return result;
+        return isValid;
     }
 
     private boolean hasNameAndDomain(String aEmailAddress) {

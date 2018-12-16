@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public final class CarDto {
+public class CarDto {
 
     private CarModel carModel;
     private int mileage;
     private boolean isDefault;
+
+    public CarDto() {
+    }
 
     public CarDto(CarModel carModel, int mileage, boolean isDefault) {
         this.carModel = carModel;
@@ -31,5 +34,17 @@ public final class CarDto {
 
     public boolean isDefault() {
         return isDefault;
+    }
+
+    public void setCarModel(CarModel carModel) {
+        this.carModel = carModel;
+    }
+
+    public void setMileage(int mileage) {
+        this.mileage = mileage;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 }

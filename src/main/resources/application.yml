@@ -2,7 +2,7 @@
 logging:
   level:
     org.springframework.web: ERROR
-    org.edds: DEBUG
+    name.edds: DEBUG
 
 mileage:
   name: Mileage service

@@ -6,6 +6,8 @@ import name.edds.mileageservice.car.Car;
 import name.edds.mileageservice.car.CarDto;
 import name.edds.mileageservice.car.CarService;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,9 @@ public final class UserController {
     UserService userService;
     CarService carService;
 
+
+    Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     UserController(UserService userService, CarService carService) {
         this.userService = userService;
@@ -35,6 +40,8 @@ public final class UserController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<User>> findUsers() {
 
+        LOGGER.debug("finding all users");
+
         return new ResponseEntity<>(
                 userService.findUsers(),
                 HttpStatus.OK);
@@ -46,7 +53,7 @@ public final class UserController {
      * @return list of Cars
      */
     @RequestMapping(value = "/{identifier}/cars", method = RequestMethod.GET)
-    public ResponseEntity<List<Car>> getCarsForUser(@PathVariable("identifier") String identifier) {
+    public ResponseEntity<List<Car>> findCarsForUser(@PathVariable("identifier") String identifier) {
         return new ResponseEntity<>(carService.listCars(identifier), HttpStatus.OK);
     }
 
@@ -80,14 +87,17 @@ public final class UserController {
      * @return
      */
     @RequestMapping(value = "/{identifier}", method = RequestMethod.GET)
-    public ResponseEntity<User> getUserById(@PathVariable("identifier") String identifier) {
+    public ResponseEntity<User> findUser(@PathVariable("identifier") String identifier) {
 
         Optional<User> user = Optional.empty();
 
-        // sniff the identify to figure out which find() to use
+        // sniff the identifier to figure out which find() to use
+
         if (userService.isValidEmailAddress(identifier)) {
+            LOGGER.debug("identifier [" + identifier + "] is a valid email address.");
             user = userService.findUser(identifier);
         } else {
+            LOGGER.debug("identifier [" + identifier + "] is NOT valid email address.");
             try {
                 user = userService.findUser(new ObjectId(identifier));
             } catch (IllegalArgumentException ex) {
@@ -97,8 +107,10 @@ public final class UserController {
         }
 
         if (user.isPresent()) {
+            LOGGER.debug("found user with identifier=[" + identifier + "].");
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
         } else {
+            LOGGER.debug("found NO user with identifier=[" + identifier + "].");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -116,8 +128,7 @@ public final class UserController {
             Optional<ObjectId> result = userService.createUser(user);
             return result.isPresent() ? new ResponseEntity<>(String.valueOf(result.get()), HttpStatus.CREATED) :
                     new ResponseEntity<>(result.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch (InvalidUserException ex) {
+        } catch (InvalidUserException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -129,14 +140,15 @@ public final class UserController {
      *
      * @return
      */
-    @RequestMapping(value = "/{identifier}/cars", method = RequestMethod.POST)
-    public ResponseEntity<String> addCarToUser(@PathVariable("userId") String userId, @RequestBody CarDto newCarDto) {
+    @RequestMapping(value = "/{idForUser}/cars", method = RequestMethod.POST)
+    public ResponseEntity<String> addCarToUser(@PathVariable("idForUser") String idForUser, @RequestBody CarDto newCarDto) {
 
+        LOGGER.debug("adding car for user=[" + idForUser + "].");
         try {
-            return carService.addNewCar(new ObjectId(userId), newCarDto);
+            ObjectId objectIdForUser = new ObjectId(idForUser);
+            return carService.addNewCar(objectIdForUser, newCarDto);
         } catch (IllegalArgumentException ex) {
-            // If the identifier passed is not valid, we didn't find a user
-            return new ResponseEntity<>(Formatter.formatErrorAsJson("Invalid user identifier"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Formatter.formatErrorAsJson("Value " + idForUser + " provided for idForUser is not a valid ObjectId"), HttpStatus.NOT_FOUND);
         }
 
     }

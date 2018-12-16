@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public final class CarService {
+public class CarService {
 
     UserService userService;
     CarRepository carRepository;
@@ -114,7 +114,6 @@ public final class CarService {
         return carRepository.find(new ObjectId(identifier));
     }
 
-
     /**
      * Find the default car for this user
      *
@@ -122,7 +121,6 @@ public final class CarService {
      * @return
      */
     public Optional<Car> findDefaultCar(User user) {
-
         return user.getCars().stream().filter(
                 car -> car.isDefault()
         ).findFirst();

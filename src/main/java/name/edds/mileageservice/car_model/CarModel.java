@@ -9,6 +9,9 @@ public class CarModel {
     // use String for yearso we match the data obtained from external source
     String year;
 
+    public CarModel() {
+    }
+
     public CarModel(String make, String model, String year) {
         this.make = make;
         this.model = model;
