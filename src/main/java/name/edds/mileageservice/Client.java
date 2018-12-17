@@ -17,6 +17,9 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
  * Create an instance of a Mongo client or return one if it is already created
+ *
+ * See http://mongodb.github.io/mongo-java-driver/3.7/bson/pojos/#advanced-configuration for details on handling
+ * the abstract ServiceEvent class and its implementations.
  */
 public class Client {
 
@@ -25,15 +28,17 @@ public class Client {
     private static final String dbHost = "localhost";
 
     public static synchronized MongoClient getInstance() {
+
         if (mongoClient == null) {
 
-            CodecRegistry pojoCodecRegistry = fromRegistries(com.mongodb.MongoClient.getDefaultCodecRegistry(),
-                    fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+            CodecRegistry pojoCodecRegistry = fromRegistries(
+                    com.mongodb.MongoClient.getDefaultCodecRegistry(),
+                    fromProviders(PojoCodecProvider.builder().automatic(true).build())
+                );
 
             MongoClientSettings settings = MongoClientSettings.builder()
                     .codecRegistry(pojoCodecRegistry)
                     .build();
-
 
             mongoClient = MongoClients.create(settings);
         }
