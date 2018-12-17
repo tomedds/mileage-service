@@ -1,39 +1,53 @@
-# Mileage Tracker API
+# RESTful service for a mileage tracker API
 
-Provides a RESTful API that will be part of an application for tracking gas mileage.
-
-NOTE: this application is in the very early stages of development.
-
+This repo contains the service component for an application that can be used to track gas mileage for your car.
+It is still pre-alpha at this point, and I'll continue to provide updates as they are ready.
 
 ## Getting Started
 
 ### Prerequisites
 
-Accesses a MongoDB server.
+Linux or MacOS. The project was developed and tested on MacOS. It should work on Linux. It will probably work on Windows but you'll need to convert the 
+import-vehicles.sh and run.sh scripts to  Windows command files.
 
+Java (Java 8 or later)
+
+The application uses MongoDB for data, so you'll need to install the MongoDB server and load it with the initial set of data.
+Detailed instructions can be found in the Installing section. Testing was done using Version 4.0.4.
+
+The [Postman](https://www.getpostman.com/) tool is handy for submitting requests to the service.
+
+Note that the current version has only been tested with everything running on localhost.
 
 ### Building
 
- `./gradlew build`
+ `./gradlew clean build`
+ 
+The application is currently configured to use port 8081. Review the application.yml file to change this or other settings such as logging.
 
 ### Installing
 
-TBD 
+#### Load required data into MongoDB
 
+Start the MongoDB server on localhost.
+
+Use the import-vehicles.sh script to create the mileage-service database and the car_models collection.
+
+TBD: load sample user data.
 
 ## Running the tests
 
-Tests are run as part of the standard build.
+Unit tests are run as part of the standard build.
+
+Details on how to run the integration tests are not yet ready.
 
 ## Deployment
 
-TBD
+No additional deployment required in this version.
 
 ## Execution
 
-You may need to run LoadData to reset the collection and loads the car data into the database.
-
-Run the main application using the JAR built by Spring Boot.
+Once you have build the application and loaded the data, you can use the `run.sh` script to start the service.
 
 ### Documentation
 
