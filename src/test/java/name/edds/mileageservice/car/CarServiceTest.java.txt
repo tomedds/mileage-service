@@ -1,0 +1,67 @@
+package name.edds.mileageservice.car;
+
+import junit.framework.TestCase;
+import name.edds.mileageservice.car_model.CarModel;
+import name.edds.mileageservice.user.UserService;
+import org.bson.types.ObjectId;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+/**
+ *  Test the construction and use of a Car
+ */
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CarServiceTest extends TestCase {
+
+    @Autowired
+    UserService userService;
+    @Autowired
+    CarRepository carRepository;
+
+    CarServiceTest() {
+    }
+
+/**
+     * A new Car needs a model and mileage and no events
+     */
+    @Test
+    void testNewCarValidation() {
+
+        CarService carService = new CarService(userService, carRepository);
+
+        CarModel carModel = new CarModel("Buick", "LeSabre", "1999");
+
+        //  public CarDto(CarModel carModel, int mileage, boolean isDefault) {
+
+        CarDto carDto = new CarDto(carModel, 12345, Boolean.TRUE);
+
+        Car newCar = new Car(carDto);
+
+        // FIXME add additional validate. For now, just do this:
+
+        assertNotNull(newCar);
+
+/*        String errMsg = carService.validateNewCar(newCar);
+        assert errMsg == "Car is missing an ID";
+
+         errMsg = carService.validateNewCar(newCar);
+        assert errMsg == "Car is missing model information";
+
+         errMsg = carService.validateNewCar(newCar);
+        assert errMsg == "Mileage must be greater than zero";
+
+        newCar.mileage = 34567;
+        carService.validateNewCar(newCar);
+
+        newCar.events = new ArrayList<>();
+        carService.validateNewCar(newCar);*/
+
+    }
+}
