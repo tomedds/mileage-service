@@ -7,8 +7,8 @@ import java.util.List;
 
 public class User {
 
-    /* Codec returns null if this is "_id" instead of "_id" */
-    private ObjectId _id;
+    /* Codec returns null if this is "id" instead of "id" */
+    private ObjectId id;
     private String lastName;
     private String firstName;
     private String email;
@@ -26,7 +26,7 @@ public class User {
     }
 
     public User(User user, List<Car> newCars) {
-        this._id = user.get_id();
+        this.id = user.getId();
         this.lastName = user.getLastName();
         this.firstName = user.getFirstName();
         this.email = user.getEmail();
@@ -35,8 +35,8 @@ public class User {
 
     /* TODO: implement equals(), hashCode(), toString() */
 
-    public ObjectId get_id() {
-        return _id;
+    public ObjectId getId() {
+        return id;
     }
 
     public String getLastName() {
@@ -55,8 +55,8 @@ public class User {
         return cars;
     }
 
-    public void set_id(ObjectId _id) {
-        this._id = _id;
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public void setLastName(String lastName) {

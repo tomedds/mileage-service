@@ -90,7 +90,9 @@ public class UserControllerTest {
 
         ObjectId objectId = new ObjectId();
 
-        given(this.mockUserService.createUser(any(User.class))).willReturn(Optional.of(objectId));
+        ResponseEntity<String> responseToReturn = new ResponseEntity<>("{\"id\": \"" + String.valueOf(objectId) + "\"}", HttpStatus.CREATED);
+
+        given(this.mockUserService.createUser(any(User.class))).willReturn(responseToReturn);
 
         User newUser = new User("testLast", "testFirst", "user@example.com", new ArrayList<>());
         String userAsJson = new JSONObject(newUser).toString();

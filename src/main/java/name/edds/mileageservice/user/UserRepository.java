@@ -33,9 +33,9 @@ public class UserRepository {
 
         try {
             ObjectId newId = new ObjectId();
-            user.set_id(newId);
+            user.setId(newId);
             userCollection.insertOne(user);
-            return Optional.of(user.get_id());
+            return Optional.of(user.getId());
         } catch (MongoWriteException ex) {
             // TODO: add logger
             println(ex);

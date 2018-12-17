@@ -70,10 +70,10 @@ public class UserServiceTest {
         // Run test
         UserService userService = new UserService(mockUserRepository);
 
-        Optional<ObjectId> newUserId = userService.createUser(testUser);
+        ResponseEntity<String> newUserResponse = userService.createUser(testUser);
 
         // Validation
-        Assert.assertEquals(userObjectId.get(), newUserId.get());
+        Assert.assertEquals("{\"id\": \"" + userObjectId.get() + "\"}", newUserResponse.getBody());
 
     }
 
@@ -94,7 +94,7 @@ public class UserServiceTest {
         UserService userService = new UserService(mockUserRepository);
 
         try {
-            Optional<ObjectId> newUserId = userService.createUser(noLastUser);
+            ResponseEntity<String> createResponse = userService.createUser(noLastUser);
             Assert.assertEquals("should never get here", "");
         }
         catch (InvalidUserException ex) {
@@ -102,7 +102,7 @@ public class UserServiceTest {
         }
 
         try {
-            Optional<ObjectId> newUserId = userService.createUser(noFirstUser);
+            ResponseEntity<String> createResponse= userService.createUser(noFirstUser);
             Assert.assertEquals("should never get here", "");
         }
         catch (InvalidUserException ex) {
@@ -110,7 +110,7 @@ public class UserServiceTest {
         }
 
         try {
-            Optional<ObjectId> newUserId = userService.createUser(noEmailUser);
+            ResponseEntity<String> createResponse = userService.createUser(noEmailUser);
             Assert.assertEquals("should never get here", "");
         }
         catch (InvalidUserException ex) {
@@ -118,17 +118,14 @@ public class UserServiceTest {
         }
 
         try {
-            Optional<ObjectId> newUserId = userService.createUser(invalidEmailUser);
+            ResponseEntity<String> createResponse = userService.createUser(invalidEmailUser);
             Assert.assertEquals("should never get here", "");
         }
         catch (InvalidUserException ex) {
             Assert.assertEquals("email is invalid.", ex.getMessage());
         }
 
-
-
     }
-
 
 
     /* To test:

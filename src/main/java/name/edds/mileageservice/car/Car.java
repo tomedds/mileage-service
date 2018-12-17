@@ -17,6 +17,10 @@ public final class Car {
     private List<ServiceEvent> events = new ArrayList<>();
     private boolean isDefault;
 
+
+    public Car() {
+    }
+
     /**
      * Create a new car from the DTO after validation
      * @param carDto

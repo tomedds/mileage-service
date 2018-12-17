@@ -124,10 +124,15 @@ public final class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> addUser(@RequestBody User user) {
 
+        // make sure now user exists with the same email address
+
+        Optional<User> existingUser = userService.findUser(user.getEmail());
+        if (existingUser.isPresent()) {
+            return new ResponseEntity<>("A user already exists with email=" + user.getEmail(), HttpStatus.CONFLICT);
+        }
+
         try {
-            Optional<ObjectId> result = userService.createUser(user);
-            return result.isPresent() ? new ResponseEntity<>(String.valueOf(result.get()), HttpStatus.CREATED) :
-                    new ResponseEntity<>(result.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return userService.createUser(user);
         } catch (InvalidUserException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -140,16 +145,40 @@ public final class UserController {
      *
      * @return
      */
-    @RequestMapping(value = "/{idForUser}/cars", method = RequestMethod.POST)
-    public ResponseEntity<String> addCarToUser(@PathVariable("idForUser") String idForUser, @RequestBody CarDto newCarDto) {
+    @RequestMapping(value = "/{userIdentifier}/cars", method = RequestMethod.POST)
+    public ResponseEntity<String> addCarToUser(@PathVariable("userIdentifier") String userIdentifier, @RequestBody CarDto newCarDto) {
 
-        LOGGER.debug("adding car for user=[" + idForUser + "].");
-        try {
-            ObjectId objectIdForUser = new ObjectId(idForUser);
-            return carService.addNewCar(objectIdForUser, newCarDto);
-        } catch (IllegalArgumentException ex) {
-            return new ResponseEntity<>(Formatter.formatErrorAsJson("Value " + idForUser + " provided for idForUser is not a valid ObjectId"), HttpStatus.NOT_FOUND);
+        LOGGER.debug("adding car for user=[" + userIdentifier + "].");
+
+        // if the identifier is an email address, get objectId for that user
+
+        Optional<ObjectId> optIdForUpdate = Optional.empty();
+
+        // TODO: see if we can improve on the if/then/else structure using Java 8 constructs
+        if (userService.isValidEmailAddress(userIdentifier)) {
+
+            Optional<User> optUser = userService.findUser(userIdentifier);
+            if (optUser.isPresent()) {
+                optIdForUpdate = Optional.of(optUser.get().getId());
+                if (null == optIdForUpdate) {
+                    throw new IllegalStateException("is for user " + userIdentifier + "is null");
+                }
+            } else {
+                return new ResponseEntity<>(Formatter.formatErrorAsJson("No user found with for " + userIdentifier), HttpStatus.NOT_FOUND);
+            }
         }
+
+        if (!optIdForUpdate.isPresent()) {
+            try {
+                optIdForUpdate = Optional.of(new ObjectId(userIdentifier));
+            } catch (IllegalArgumentException ex) {
+                return new ResponseEntity<>(Formatter.formatErrorAsJson("Value " + userIdentifier + " provided for idForUser is not a valid identifier"), HttpStatus.NOT_FOUND);
+            }
+
+        }
+
+        return carService.addNewCar(optIdForUpdate.get(), newCarDto);
+
 
     }
 

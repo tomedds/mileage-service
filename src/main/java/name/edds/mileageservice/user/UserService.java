@@ -1,13 +1,15 @@
 package name.edds.mileageservice.user;
 
+import name.edds.mileageservice.Formatter;
 import name.edds.mileageservice.Properties;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.el.MethodNotFoundException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.List;
@@ -41,7 +43,7 @@ public class UserService {
      * @param user
      * @return
      */
-    public Optional<ObjectId> createUser(User user) throws InvalidUserException {
+    public  ResponseEntity<String> createUser(User user) throws InvalidUserException {
 
         if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
             throw new InvalidUserException("first name is missing.");
@@ -64,7 +66,15 @@ public class UserService {
             throw new InvalidUserException("list of cars is null.");
         }
 
-        return userRepository.createUser(user);
+        // TODO: need to format ID returned as JSON
+        Optional<ObjectId> newUserId = userRepository.createUser(user);
+
+        if (newUserId.isPresent()) {
+            return new ResponseEntity<>("{\"id\": \"" + String.valueOf(newUserId.get()) + "\"}", HttpStatus.CREATED);
+         } else {
+            return new ResponseEntity<>(Formatter.formatErrorAsJson("user create failed."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     /**

@@ -49,7 +49,7 @@ public class CarRepository {
         updatedCars.add(newCar);
         User updatedUser = new User(user, updatedCars);
 
-        userCollection.updateOne(eq("_id", updatedUser.get_id()),
+        userCollection.updateOne(eq("_id", updatedUser.getId()),
                 combine(set("cars", updatedUser.getCars())));
 
         return newCar.getId().toString();
@@ -62,6 +62,10 @@ public class CarRepository {
      */
     Optional<Car> find(ObjectId objectId) {
         User userWithCar = dbService.getUserCollection().find(eq("cars._id", objectId)).first();
+
+        if (null == userWithCar) {
+            return Optional.empty();
+        }
 
         return userWithCar.getCars().stream().filter(
                 car ->

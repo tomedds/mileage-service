@@ -5,6 +5,8 @@ import name.edds.mileageservice.events.FuelingDto;
 import name.edds.mileageservice.user.User;
 import name.edds.mileageservice.user.UserService;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ public class CarController {
     CarService carService;
     UserService userService;
     EventService eventService;
+
+    Logger LOGGER = LoggerFactory.getLogger(CarController.class);
 
     @Autowired
     CarController(CarService carService, UserService userService, EventService eventService) {
@@ -70,17 +74,24 @@ public class CarController {
     }
 
     /**
-     * Update a car
+     * Fetch a car
      *
      * @return
      */
     @RequestMapping(value = "/{carId}", method = RequestMethod.GET)
     ResponseEntity<Car> getCar(@PathVariable("carId") String carId) {
-        Optional<Car> car = carService.find(carId);
 
-        // TODO: research return Empty Car here instead of null
-        return car.isPresent() ? new ResponseEntity<>(car.get(), HttpStatus.OK) :
-                new ResponseEntity<>(car.get(), HttpStatus.NOT_FOUND);
+        try {
+            ObjectId carObjectId = new ObjectId(carId);
+            Optional<Car> car = carService.find(carObjectId);
+
+            return car.isPresent() ? new ResponseEntity<>(car.get(), HttpStatus.OK) :
+                    new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warn("Invalid value passed for carId:" + carId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
 
 
@@ -98,36 +109,46 @@ public class CarController {
     }
 
     /**
-     * Add a fueling event to a car
+     * Add a fueling event to a car. We use the carId directly and so don't need the user id.
      *
      * @return
      */
     @RequestMapping(value = "/{carId}/fueling", method = RequestMethod.POST)
-    public ResponseEntity<String> addFueling(@PathVariable("userId") String userId,
-                                             @PathVariable("carId") String carId,
+    public ResponseEntity<String> addFueling(@PathVariable("carId") String carId,
                                              @RequestBody FuelingDto fuelingDto) {
-        String errMsg;
 
         try {
-            // The userId passed as part of the REST URL needs to be valid but we don't actually use it
+            // FIXME: for now, always add fueling to default car. This needs to be the currently selected car
+            ObjectId carObjectId = new ObjectId(carId);
 
-            Optional<User> user =userService.findUser(new ObjectId(userId));
-
-            try {
-                // FIXME: for now, always add fueling to default car. This needs to be the currently selected car
-                errMsg = eventService.saveNewFueling(user.get(), fuelingDto);
-
-                if (errMsg.isEmpty()) {
-                    return new ResponseEntity<String>("", HttpStatus.CREATED);
+            // Make sure this car exists
+            Optional<Car> car = carService.find(carObjectId);
+            if (car.isPresent()) {
+                if (eventService.saveNewFueling(carObjectId, fuelingDto)) {
+                    return new ResponseEntity<>("", HttpStatus.CREATED);
+                } else {
+                    return new ResponseEntity<>("Error saving fueling.", HttpStatus.BAD_REQUEST);
                 }
-            } catch (IllegalArgumentException ex) {
-                errMsg = "car id value is not a valid ObjectId";
+            } else {
+                return new ResponseEntity<>("No car found with this ID.", HttpStatus.NOT_FOUND);
             }
+
         } catch (IllegalArgumentException ex) {
-            errMsg = "user id value is not a valid ObjectId";
+            return new ResponseEntity<>("car id value is not a valid ObjectId", HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<String>(errMsg, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Add a fueling event to the default car for this user.
+     *
+     * @return
+     */
+    @RequestMapping(value = "user/{userIdentifier}/defaultCar/fueling", method = RequestMethod.POST)
+    public ResponseEntity<String> addFuelingToDefault(@PathVariable("carId") String carId,
+                                                      @RequestBody FuelingDto fuelingDto) {
+        /* not implemented yet */
+        return new ResponseEntity<>("Feature not implemented", HttpStatus.METHOD_NOT_ALLOWED);
 
     }
 

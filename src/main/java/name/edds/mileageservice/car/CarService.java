@@ -110,8 +110,8 @@ public class CarService {
      * @return
      */
 
-    public Optional<Car> find(String identifier) {
-        return carRepository.find(new ObjectId(identifier));
+    public Optional<Car> find(ObjectId carId) {
+        return carRepository.find(carId);
     }
 
     /**
