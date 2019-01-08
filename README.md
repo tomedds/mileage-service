@@ -80,7 +80,7 @@ TBD
 
 ## License
 
-TBD
+Copyright 2019, Tom Edds
 
 ## Acknowledgements
 
