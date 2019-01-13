@@ -80,7 +80,8 @@ TBD
 
 ## License
 
-Copyright 2019, Tom Edds
+Copyright &copy; 2019, Tom Edds. All rights reserved.
+
 
 ## Acknowledgements
 
